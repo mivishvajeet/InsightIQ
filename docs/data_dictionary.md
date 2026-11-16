@@ -149,3 +149,4 @@ This data dictionary documents the raw relational dataset used by InsightIQ, det
 * **File:** `product_category_name_translation.csv`
 * **Grain:** 1 row per mapped category.
 * **Rows:** 71 rows. Translates Portuguese names to English. Unmapped categories fall back to clean title-case Portuguese or `'uncategorized'`.
+

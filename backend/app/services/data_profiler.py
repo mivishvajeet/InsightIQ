@@ -257,3 +257,4 @@ if __name__ == "__main__":
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
     print(f"Data profiling report generated at: {out_path}")
+

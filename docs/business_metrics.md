@@ -115,3 +115,4 @@ FROM customer_order_counts;
 * **Formula:** $\frac{\sum \text{review\_score}}{\text{Count of Reviews}}$
 * **Handling Multiple Reviews:** When an order receives multiple reviews (547 occurrences), analytical views use the most recent review by `review_answer_timestamp` or average score per order.
 * **Verified Dataset Value:** **4.09**
+

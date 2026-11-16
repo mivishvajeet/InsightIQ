@@ -68,3 +68,4 @@ This document records the foundational architectural decisions taken based on em
 * **Decision:**
   - By default, core sales performance metrics (Revenue, GMV, AOV, Seller Sales, Category Sales) must explicitly filter for `order_status = 'delivered'` unless the user question specifically asks about cancellations, pipeline orders, or fulfillment drop-offs.
   - This rule will be codified in `metric_definitions.md`, `sales_business_rules.md`, and SQL analytics views.
+

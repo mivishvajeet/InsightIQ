@@ -47,3 +47,4 @@ def download_dataset(target_dir: Path = Path("data/raw")):
 
 if __name__ == "__main__":
     download_dataset()
+

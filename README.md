@@ -69,3 +69,4 @@ InsightIQ enables business users and data analysts to interact with enterprise d
 4. **Data Cleansing Rules:**
    - Two categories (`pc_gamer`, `portateis_cozinha_e_preparadores_de_alimentos`) and null categories handled via fallback translations in `dim_products`.
    - 547 orders with multiple reviews are deduplicated to the latest answer timestamp for 1:1 order views.
+

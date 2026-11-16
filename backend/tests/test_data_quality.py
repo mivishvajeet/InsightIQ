@@ -178,3 +178,4 @@ def test_category_translation_completeness(raw_data):
     assert len(missing_cats) == 2, f"Expected 2 untranslated categories, got {missing_cats}"
     assert "pc_gamer" in missing_cats
     assert "portateis_cozinha_e_preparadores_de_alimentos" in missing_cats
+

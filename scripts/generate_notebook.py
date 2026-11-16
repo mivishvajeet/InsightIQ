@@ -160,3 +160,4 @@ with open(nb_path, "w", encoding="utf-8") as f:
     json.dump(notebook_content, f, indent=2)
 
 print(f"Jupyter Notebook generated at: {nb_path}")
+
