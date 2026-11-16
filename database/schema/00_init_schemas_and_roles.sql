@@ -38,3 +38,4 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA analytics GRANT SELECT ON SEQUENCES TO insigh
 REVOKE CREATE ON SCHEMA raw FROM insightiq_readonly;
 REVOKE CREATE ON SCHEMA staging FROM insightiq_readonly;
 REVOKE CREATE ON SCHEMA analytics FROM insightiq_readonly;
+

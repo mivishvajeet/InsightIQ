@@ -81,3 +81,4 @@ def test_readonly_user_schema_isolation():
         with readonly_engine.connect() as conn:
             conn.execute(text("SELECT * FROM raw.customers LIMIT 1;"))
     assert "permission denied" in str(exc_info.value).lower()
+

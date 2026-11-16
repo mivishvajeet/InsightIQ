@@ -103,3 +103,4 @@ CREATE INDEX IF NOT EXISTS idx_raw_order_items_seller ON raw.order_items(seller_
 CREATE INDEX IF NOT EXISTS idx_raw_order_payments_order ON raw.order_payments(order_id);
 CREATE INDEX IF NOT EXISTS idx_raw_order_reviews_order ON raw.order_reviews(order_id);
 CREATE INDEX IF NOT EXISTS idx_raw_geolocation_zip ON raw.geolocation(geolocation_zip_code_prefix);
+
