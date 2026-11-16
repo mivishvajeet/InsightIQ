@@ -151,3 +151,4 @@ JOIN staging.stg_orders o ON r.order_id = o.order_id;
 ALTER TABLE analytics.fact_reviews ADD CONSTRAINT fk_fact_rev_order FOREIGN KEY (order_id) REFERENCES analytics.fact_orders(order_id);
 CREATE INDEX idx_fact_rev_order ON analytics.fact_reviews(order_id);
 CREATE INDEX idx_fact_rev_score ON analytics.fact_reviews(review_score);
+

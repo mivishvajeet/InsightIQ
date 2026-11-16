@@ -48,3 +48,4 @@ SELECT
 FROM analytics.v_customer_rfm_segments
 GROUP BY customer_segment
 ORDER BY total_revenue DESC;
+

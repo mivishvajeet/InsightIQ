@@ -158,3 +158,4 @@ SELECT
     MODE() WITHIN GROUP (ORDER BY UPPER(TRIM(geolocation_state))) AS representative_state
 FROM raw.geolocation
 GROUP BY geolocation_zip_code_prefix;
+

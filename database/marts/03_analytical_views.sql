@@ -139,3 +139,4 @@ GROUP BY ds.seller_id, ds.seller_city, ds.seller_state;
 GRANT USAGE ON SCHEMA analytics TO insightiq_readonly;
 GRANT SELECT ON ALL TABLES IN SCHEMA analytics TO insightiq_readonly;
 GRANT SELECT ON ALL SEQUENCES IN SCHEMA analytics TO insightiq_readonly;
+

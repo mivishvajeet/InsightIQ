@@ -140,3 +140,4 @@ def test_zero_cartesian_inflation_in_fact_orders():
         ).scalar()
 
         assert float(orders_sum) == float(items_sum) == 13221498.11
+

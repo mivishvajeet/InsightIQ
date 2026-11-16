@@ -49,3 +49,4 @@ GROUP BY dp.product_category_name_english
 HAVING COUNT(foi.order_item_id) >= 100
 ORDER BY avg_delivery_days DESC
 LIMIT 10;
+

@@ -54,3 +54,4 @@ SELECT
 FROM analytics.v_monthly_sales
 ORDER BY total_delivered_revenue DESC
 LIMIT 1;
+

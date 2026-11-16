@@ -88,3 +88,4 @@ FROM staging.stg_sellers;
 
 ALTER TABLE analytics.dim_sellers ADD PRIMARY KEY (seller_id);
 CREATE INDEX idx_dim_sellers_state ON analytics.dim_sellers(seller_state);
+
