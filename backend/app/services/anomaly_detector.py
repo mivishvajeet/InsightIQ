@@ -119,3 +119,4 @@ if __name__ == "__main__":
     print("Top Statistical Anomalies in Olist History:")
     for a in top:
         print(f"  {a['date']}: R$ {a['daily_revenue']:,.2f} ({a['order_count']} orders) | Z={a['z_score']} | {a['business_context']}")
+

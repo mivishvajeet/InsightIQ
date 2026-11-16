@@ -114,3 +114,4 @@ if __name__ == "__main__":
     trends = KPIService.get_monthly_growth_trend()
     print("\nRecent Monthly Trends:")
     print(trends.tail(5)[["year_month", "total_delivered_revenue", "revenue_mom_pct", "delivered_orders"]])
+

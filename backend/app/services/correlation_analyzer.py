@@ -149,3 +149,4 @@ if __name__ == "__main__":
     print(f"  On-Time Avg Score: {res['comparative_cohorts']['on_time_orders']['avg_review_score']} (1-star: {res['comparative_cohorts']['on_time_orders']['one_star_rate_pct']}%)")
     print(f"  Delayed Avg Score: {res['comparative_cohorts']['delayed_orders']['avg_review_score']} (1-star: {res['comparative_cohorts']['delayed_orders']['one_star_rate_pct']}%)")
     print(f"  1-Star Surge Factor: {res['comparative_cohorts']['one_star_surge_factor']}x higher for delayed orders!")
+

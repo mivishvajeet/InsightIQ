@@ -103,3 +103,4 @@ def configure_plotly_theme(fig: go.Figure) -> go.Figure:
         yaxis=dict(gridcolor="#334155", zerolinecolor="#334155"),
     )
     return fig
+

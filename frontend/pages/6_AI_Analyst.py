@@ -130,3 +130,4 @@ if st.button("🚀 Analyze with Agent", type="primary"):
             fig = px.bar(df_res, x=x_col, y=y_col, title=f"{y_col} by {x_col}", color_discrete_sequence=["#0D9488"])
             configure_plotly_theme(fig)
             st.plotly_chart(fig, use_container_width=True)
+

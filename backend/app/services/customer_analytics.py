@@ -142,3 +142,4 @@ if __name__ == "__main__":
     top = service.get_top_customers(3)
     print("\nTop 3 Customers:")
     print(top[["customer_unique_id", "state", "order_count", "total_spend"]])
+
