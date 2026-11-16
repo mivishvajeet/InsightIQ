@@ -69,3 +69,33 @@ This document records the foundational architectural decisions taken based on em
   - By default, core sales performance metrics (Revenue, GMV, AOV, Seller Sales, Category Sales) must explicitly filter for `order_status = 'delivered'` unless the user question specifically asks about cancellations, pipeline orders, or fulfillment drop-offs.
   - This rule will be codified in `metric_definitions.md`, `sales_business_rules.md`, and SQL analytics views.
 
+---
+
+## Phase 2: PostgreSQL Architecture, Schema Isolation, & Role-Based Security
+
+### Decision 6: Port Isolation & Local Service Compatibility
+
+* **Context:**
+  A running Docker container (`buildlog-db`) already occupied port `5432` on the host machine.
+* **Decision:**
+  - Configured InsightIQ's PostgreSQL service in `docker-compose.yml` to bind to port `${POSTGRES_PORT:-5433}:5432`.
+  - Kept default internal container port at 5432 with explicit environment variable mapping across `.env` and `backend/app/services/database.py`.
+  - Avoided any port conflicts or interruption to existing workloads.
+
+---
+
+### Decision 7: Multi-Schema Isolation and Principle of Least Privilege
+
+* **Context:**
+  An autonomous AI agent generating SQL queries poses risks of accidental data modification, destructive DDL, or data exposure.
+* **Decision:**
+  - Segregated database into three schemas:
+    1. `raw`: Ingested source tables with zero transformation.
+    2. `staging`: Cleaned views and type-cast models.
+    3. `analytics`: Fact tables, dimension tables, and approved business reporting views.
+  - Created a dedicated `insightiq_readonly` role with:
+    - `default_transaction_read_only = on`
+    - `statement_timeout = '10s'`
+    - Access granted **exclusively** to the `analytics` schema (`GRANT USAGE ON SCHEMA analytics`).
+    - Explicit `REVOKE ALL` on `raw` and `staging`.
+    - Absolute inability to run `INSERT`, `UPDATE`, `DELETE`, or `DROP`.
