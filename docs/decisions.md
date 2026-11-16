@@ -145,3 +145,25 @@ This document records the foundational architectural decisions taken based on em
   - Built `CorrelationAnalyzer` calculating Pearson $r$ and Spearman $\rho$.
   - Quantified the impact: delayed orders drop from 4.29 to 2.56 average stars and increase 1-star review probability by 7.02x.
   - Mandated that the analytical tool return explicit caveat strings forbidding the agent from claiming proven causation without controlled A/B testing.
+
+---
+
+## Phase 5: Local LLM Integration (Ollama + Qwen 2.5 3B) & SQL Security Engine
+
+### Decision 12: Local Ollama Runtime for Zero-Cost, Private LLM Execution
+
+* **Context:**
+  Project requirements mandate: "All core functionality must work locally without paid APIs or subscriptions. Ollama — local LLM runtime, Qwen 2.5 3B — primary LLM, Nomic Embed Text — embedding model."
+* **Decision:**
+  - Installed and initiated Ollama service locally (`http://localhost:11434`).
+  - Pulled `qwen2.5:3b` (3.1B parameter model with tools/completion capability) and `nomic-embed-text` (768-dim embeddings).
+  - Built `OllamaClient` with structured JSON mode, connection health checks, and 45s timeout protection.
+
+### Decision 13: Few-Shot Grounding and Self-Healing SQL Reflection Loop
+
+* **Context:**
+  Small local models (3B) can occasionally make minor column naming errors on complex relational schemas (e.g., guessing `date_key` instead of `order_purchase_timestamp` or `v_monthly_sales`).
+* **Decision:**
+  - Enriched system prompts with concrete few-shot exemplars mapping natural language questions to approved analytics views.
+  - Built `generate_and_execute` with an automated self-healing retry loop: if PostgreSQL returns a syntax or column error, the error traceback is reflected back to Qwen to self-correct in real time.
+  - Enforced deterministic temperature ($T = 0.0$) for SQL generation to guarantee reproducible queries.
