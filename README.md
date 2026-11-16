@@ -40,7 +40,7 @@ InsightIQ enables business users and data analysts to interact with enterprise d
 - [x] **Phase 1: Dataset exploration and data quality assessment** *(Completed)*
 - [x] **Phase 2: PostgreSQL setup and data ingestion** *(Completed)*
 - [x] **Phase 3: Data modelling and SQL analytics** *(Completed)*
-- [ ] **Phase 4: Python analytical engine and Streamlit dashboard**
+- [x] **Phase 4: Python analytical engine and Streamlit dashboard** *(Completed)*
 - [ ] **Phase 5: Local LLM integration using Ollama (Qwen 2.5 3B)**
 - [ ] **Phase 6: RAG implementation using LangChain and ChromaDB**
 - [ ] **Phase 7: SQL agent and tool orchestration**

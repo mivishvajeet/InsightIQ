@@ -110,15 +110,7 @@ This document records the foundational architectural decisions taken based on em
   In BI applications and LLM text-to-SQL generation, questions such as "What is the monthly revenue?", "What is the average order value?", and "Compare sales performance across Brazilian states" frequently lead to improper join cardinality errors when LLMs join orders, order_items, and payments in a single query.
 * **Decision:**
   - Designed `analytics.fact_orders` with pre-aggregated order level metrics:
-    - `total_item_value`
-    - `total_freight_value`
-    - `total_order_amount`
-    - `item_count`
-    - `payment_count`
-    - `total_payment_value`
-    - `latest_review_score`
-    - `delivery_lead_time_days`
-    - `delivery_delay_days`
+    - `total_item_value`, `total_freight_value`, `total_order_amount`, `item_count`, `payment_count`, `total_payment_value`, `latest_review_score`, `delivery_lead_time_days`, `delivery_delay_days`.
   - High-level KPI questions can now be answered directly from `fact_orders` without multi-table joins.
   - Granular queries (by product category or seller) query `fact_order_items` joined to `dim_products` and `dim_sellers`.
 
@@ -131,3 +123,25 @@ This document records the foundational architectural decisions taken based on em
     - Reference anchor date: `2018-10-18` (one day after dataset operational close).
     - Customer segments: `Champions`, `Loyal Customers`, `High-Value Recent`, `Recent One-Offs`, `At Risk Repeaters`, `Hibernating / One-Offs`.
     - Computed at the `customer_unique_id` grain.
+
+---
+
+## Phase 4: Python Analytical Engine & Interactive BI Dashboard
+
+### Decision 10: Parametric & Non-Parametric Dual Anomaly Detection
+
+* **Context:**
+  Time-series revenue fluctuations in e-commerce can stem from regular promotional events or operational failures.
+* **Decision:**
+  - Combined parametric Z-Score ($z > 2.5$) with non-parametric IQR ($1.5 \times IQR$).
+  - Identified `2017-11-24` as Black Friday ($Z = 10.44$, R\$ 175k revenue in a single day).
+  - Provided contextual metadata tagging to distinguish expected marketing events from operational disruptions.
+
+### Decision 11: Correlation vs. Causation Guardrails in Analytics Engine
+
+* **Context:**
+  Business users and agents often conflate statistical correlation with causation (e.g. asserting that slow deliveries *cause* all bad reviews, ignoring defective merchandise or uncommunicative sellers).
+* **Decision:**
+  - Built `CorrelationAnalyzer` calculating Pearson $r$ and Spearman $\rho$.
+  - Quantified the impact: delayed orders drop from 4.29 to 2.56 average stars and increase 1-star review probability by 7.02x.
+  - Mandated that the analytical tool return explicit caveat strings forbidding the agent from claiming proven causation without controlled A/B testing.
