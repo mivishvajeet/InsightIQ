@@ -18,3 +18,4 @@
 ## 4. Brazilian Currency & Monetary Format
 - All financial metrics are denominated in Brazilian Real (BRL / R$).
 - Query results should round financial figures to 2 decimal places using `ROUND(..., 2)`.
+

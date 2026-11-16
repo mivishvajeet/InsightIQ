@@ -35,3 +35,4 @@ InsightIQ models Olist data in PostgreSQL using three isolated schemas:
 - `v_state_sales_distribution`: State-level sales, customer counts, and on-time fulfillment rates.
 - `v_customer_rfm_segments`: Recency, Frequency, Monetary customer segments at `customer_unique_id` grain.
 - `v_seller_performance`: Seller total sales, assigned orders, and cancellation rates.
+

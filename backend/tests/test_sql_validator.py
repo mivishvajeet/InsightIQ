@@ -70,3 +70,4 @@ def test_enforce_limit_injection():
     already_limited = "SELECT * FROM analytics.fact_orders LIMIT 25"
     not_modified = SQLValidator.enforce_limit(already_limited, default_limit=500)
     assert not_modified == already_limited
+

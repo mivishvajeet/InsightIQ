@@ -11,3 +11,4 @@
 ## 3. Key Satisfaction Findings
 - **Impact of Delivery Delays:** Orders delivered on-time average 4.29 ★. Delayed orders experience a severe drop to 2.56 ★, with 46.2% of delayed orders receiving a 1-star rating (7x higher than on-time orders).
 - **Correlation vs. Causation Rule:** Delivery delay is strongly correlated with negative reviews, but the AI agent must never present an unverified hypothesis as an established sole root cause. Merchandise quality, seller accuracy, and package damage also impact ratings.
+

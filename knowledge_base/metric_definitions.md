@@ -28,3 +28,4 @@
   - On-Time: $\text{Actual} \le \text{Estimated}$ (Delay $\le 0$). Platform On-Time Rate: 91.89%.
   - Delayed: $\text{Actual} > \text{Estimated}$ (Delay $> 0$).
 - **Customer Satisfaction Impact:** On-time orders average 4.29 ★; delayed orders drop to 2.56 ★ (a 7x increase in 1-star reviews).
+

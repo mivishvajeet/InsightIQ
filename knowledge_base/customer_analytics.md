@@ -22,3 +22,4 @@ InsightIQ segments the customer base using operational transaction history (rela
 ## 3. Customer Retention Characteristics
 - Overall repeat purchase rate is 3.12%, typical for an e-commerce marketplace integrator where customer relationships are mediated by external host portals.
 - Maximizing repeat purchase retention requires targeting High-Value Recent buyers before they cross the 180-day dormancy boundary.
+

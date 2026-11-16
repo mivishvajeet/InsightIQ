@@ -16,3 +16,4 @@ Olist is a Brazilian e-commerce marketplace integrator that connects small and m
 3. **Dispatch to Carrier:** Seller packs parcel and hands it to the logistics carrier before `shipping_limit_date`.
 4. **Customer Delivery:** Carrier delivers package to customer address.
 5. **Customer Feedback:** Customer receives satisfaction survey rating the order from 1 to 5 stars.
+

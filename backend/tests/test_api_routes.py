@@ -58,3 +58,4 @@ def test_api_correlations_delivery():
     data = response.json()
     assert "correlations" in data
     assert "comparative_cohorts" in data
+

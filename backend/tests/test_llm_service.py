@@ -60,3 +60,4 @@ def test_sql_generator_enforces_limit():
     unlimited = "SELECT customer_state FROM analytics.dim_customers"
     safe = SQLValidator.enforce_limit(unlimited, default_limit=10)
     assert "LIMIT 10" in safe
+

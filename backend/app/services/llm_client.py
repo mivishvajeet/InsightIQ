@@ -120,3 +120,4 @@ class OllamaClient:
         except requests.exceptions.RequestException as e:
             logger.error(f"Ollama chat request failed: {e}")
             raise RuntimeError(f"Ollama chat error: {e}") from e
+
