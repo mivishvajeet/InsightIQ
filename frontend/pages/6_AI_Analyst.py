@@ -1,8 +1,7 @@
 """
-InsightIQ: AI Analyst & Dual-Mode Agentic Interface.
-Supports:
-1. Natural Language SQL Analytics (PostgreSQL + AstValidator + Self-Healing)
-2. Domain Knowledge Retrieval (LangChain + ChromaDB + Nomic Embed Text + Qwen 2.5 3B)
+InsightIQ: AI Analyst & Autonomous Agent Studio.
+Empowers business users and data analysts to interact with enterprise data using natural language,
+orchestrating SQL Analytics, RAG Knowledge Retrieval, and Python Analytics with full execution transparency.
 """
 
 import sys
@@ -16,139 +15,154 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from backend.app.services.sql_generator import SQLGenerator
-from backend.app.rag.pipeline import rag_pipeline
+from backend.app.agents.orchestrator import orchestrator_agent
+from backend.app.tools.registry import tool_registry
 from frontend.components.styles import apply_theme, configure_plotly_theme
 
 st.set_page_config(page_title="AI Analyst | InsightIQ", page_icon="🤖", layout="wide")
 apply_theme()
 
-st.title("🤖 AI Analyst & Knowledge Agent")
+st.title("🤖 AI Analyst & Agent Studio")
 st.markdown(
-    "Explore business data through natural language. InsightIQ leverages local **Qwen 2.5 3B** and "
-    "**Nomic Embed Text** to generate validated PostgreSQL queries and retrieve grounded business knowledge."
+    "Ask natural language business questions. InsightIQ's autonomous agent interprets intent, coordinates specialized tools "
+    "(PostgreSQL SQL Analytics, ChromaDB Knowledge RAG, and Python Statistical Engines), and presents evidence-backed answers."
 )
 
-tab_sql, tab_rag = st.tabs(["📊 Natural Language SQL", "📚 Knowledge Base RAG"])
+# Sidebar Tool Monitor
+with st.sidebar:
+    st.subheader("🛠️ Registered Agent Tools")
+    tools = tool_registry.list_tools()
+    for t in tools:
+        st.markdown(f"**`{t['name']}`**")
+        st.caption(t["description"])
+        st.markdown("---")
 
-sql_generator = SQLGenerator()
+tab_agent, tab_sql, tab_rag = st.tabs([
+    "⚡ Autonomous Agent Orchestrator",
+    "📊 Direct SQL Analytics",
+    "📚 Direct Knowledge RAG",
+])
 
 # =========================================================================
-# TAB 1: NATURAL LANGUAGE SQL
+# TAB 1: AUTONOMOUS AGENT ORCHESTRATOR
 # =========================================================================
-with tab_sql:
-    st.subheader("Data Analytics & Natural Language SQL")
-    st.markdown("Ask quantitative business questions to query PostgreSQL `analytics` schema with automatic AST validation and self-healing.")
+with tab_agent:
+    st.subheader("Autonomous Multi-Tool Agent Orchestration")
+    st.markdown("The agent automatically determines whether SQL, RAG, Python calculations, or multiple tools are required.")
 
-    SQL_EXAMPLES = [
+    AGENT_EXAMPLES = [
         "What is the monthly revenue trend?",
         "Which product category generates the highest sales?",
         "Compare sales performance across Brazilian states",
-        "How many customers made repeat purchases?",
-        "What is the average order value?",
+        "How is customer retention calculated?",
+        "What is our delivered revenue and how is it defined?",
         "Are delivery delays associated with lower review scores?",
-        "Which sellers have the highest cancellation rates?",
+        "Detect statistical revenue anomalies and spikes",
+        "What customer segments generate the most revenue?",
     ]
 
-    selected_sql = st.selectbox("💡 Example SQL Questions:", ["-- Custom Query --"] + SQL_EXAMPLES, key="sql_select")
-    user_sql_query = st.text_input(
-        "Enter your analytical question:",
-        value="" if selected_sql.startswith("--") else selected_sql,
-        key="sql_input",
+    col_select, col_mode = st.columns([3, 1])
+    with col_select:
+        selected_agent_q = st.selectbox("💡 Suggested Business Questions:", ["-- Custom Question --"] + AGENT_EXAMPLES, key="agent_select")
+    with col_mode:
+        mode_override = st.selectbox("Execution Mode:", ["auto", "sql", "rag", "python", "hybrid"], index=0)
+
+    user_agent_query = st.text_input(
+        "Enter your question for the AI Agent:",
+        value="" if selected_agent_q.startswith("--") else selected_agent_q,
+        key="agent_input",
     )
 
-    if st.button("🚀 Run SQL Agent", type="primary", key="btn_sql"):
-        if not user_sql_query:
-            st.warning("Please enter or select a question.")
+    if st.button("🚀 Run Agentic Workflow", type="primary", key="btn_agent"):
+        if not user_agent_query:
+            st.warning("Please enter or select a business question.")
         else:
-            with st.spinner("Qwen 2.5 3B interpreting question, validating SQL AST, and executing against PostgreSQL..."):
+            with st.spinner("Agent analyzing intent, dispatching tools, and synthesizing evidence..."):
                 start_t = time.time()
-                sql, df_res, error = sql_generator.generate_and_execute(user_sql_query)
-                explanation = sql_generator.explain_query(user_sql_query, sql) if not error else "Execution error occurred."
+                result = orchestrator_agent.run(
+                    question=user_agent_query,
+                    mode_override=None if mode_override == "auto" else mode_override,
+                )
                 elapsed = round(time.time() - start_t, 2)
 
-            if error:
-                st.error(f"❌ Execution Error: {error}")
-                st.code(sql, language="sql")
-            else:
-                st.success(f"✅ Executed Successfully ({len(df_res)} rows returned in {elapsed}s)")
+            st.success(f"✅ Workflow Completed in {elapsed}s | Intent: **{result.intent.upper()}** | Tools Used: **{', '.join(result.tools_used)}**")
 
-                st.markdown("<div class='section-header'>Agent Reasoning & SQL Transparency</div>", unsafe_allow_html=True)
-                st.markdown(f"**Explanation:** {explanation}")
-                st.code(sql.strip(), language="sql")
+            # Execution Steps Trace
+            st.markdown("<div class='section-header'>Agent Execution Trace & Tool Thought Steps</div>", unsafe_allow_html=True)
+            for step in result.execution_steps:
+                tool_badge = f" [`{step['tool_name']}`]" if step.get("tool_name") else ""
+                icon = "🟢" if step["status"] == "completed" else "🔴"
+                st.markdown(
+                    f"{icon} **Step {step['step_number']}: {step['step_name']}**{tool_badge} "
+                    f"({step['duration_seconds']}s) — *{step['description']}*"
+                )
 
-                st.markdown("<div class='section-header'>Query Results</div>", unsafe_allow_html=True)
-                st.dataframe(df_res, use_container_width=True, hide_index=True)
+            # Executive Answer
+            st.markdown("<div class='section-header'>Executive Business Answer</div>", unsafe_allow_html=True)
+            st.markdown(result.final_answer)
 
-                num_cols = df_res.select_dtypes(include=["number"]).columns
-                if len(num_cols) > 0 and len(df_res.columns) > 1:
+            # Structured Data & Visual Evidence (if SQL or Python data present)
+            if result.data_table:
+                df_data = pd.DataFrame(result.data_table)
+                st.markdown("<div class='section-header'>Structured Data Evidence</div>", unsafe_allow_html=True)
+                st.dataframe(df_data, use_container_width=True, hide_index=True)
+
+                num_cols = df_data.select_dtypes(include=["number"]).columns
+                if len(num_cols) > 0 and len(df_data.columns) > 1:
                     st.markdown("<div class='section-header'>Visual Evidence</div>", unsafe_allow_html=True)
-                    x_col = df_res.columns[0]
+                    x_col = df_data.columns[0]
                     y_col = num_cols[0]
-                    fig = px.bar(df_res.head(15), x=x_col, y=y_col, title=f"{y_col} by {x_col}", color_discrete_sequence=["#0D9488"])
+                    fig = px.bar(df_data.head(15), x=x_col, y=y_col, title=f"{y_col} by {x_col}", color_discrete_sequence=["#0D9488"])
                     configure_plotly_theme(fig)
                     st.plotly_chart(fig, use_container_width=True)
 
+            # SQL Query Transparency (if SQL tool was used)
+            if result.sql_query:
+                st.markdown("<div class='section-header'>Generated PostgreSQL Query</div>", unsafe_allow_html=True)
+                st.code(result.sql_query, language="sql")
+
+            # Citations (if RAG tool was used)
+            if result.citations:
+                st.markdown("<div class='section-header'>Retrieved Knowledge Base Citations</div>", unsafe_allow_html=True)
+                for i, c in enumerate(result.citations, 1):
+                    with st.expander(f"📄 Citation [{i}]: {c['source']} — {c['section']}"):
+                        st.markdown(f"**Chunk ID:** `{c['chunk_id']}`")
+                        st.markdown(f"**Relevance:** `{c['relevance_score']:.4f}`")
+                        st.info(c["snippet"])
+
 # =========================================================================
-# TAB 2: KNOWLEDGE BASE RAG
+# TAB 2: DIRECT SQL ANALYTICS
+# =========================================================================
+with tab_sql:
+    st.subheader("Direct Natural Language SQL Execution")
+    st.markdown("Translates natural-language questions directly to PostgreSQL with AST security checks.")
+
+    sql_q = st.text_input("Enter SQL-specific analytical question:", key="direct_sql_input", value="What is the average order value?")
+    if st.button("Run SQL", key="btn_direct_sql"):
+        with st.spinner("Generating SQL..."):
+            out = tool_registry.execute_tool("sql_analytics_tool", question=sql_q)
+        if out["success"]:
+            st.success(f"Executed in {out['execution_time_seconds']}s ({out['row_count']} rows)")
+            st.code(out["sql"], language="sql")
+            st.dataframe(pd.DataFrame(out["data"]), use_container_width=True)
+        else:
+            st.error(out["error"])
+
+# =========================================================================
+# TAB 3: DIRECT KNOWLEDGE RAG
 # =========================================================================
 with tab_rag:
-    st.subheader("Context-Grounded Knowledge Retrieval")
-    st.markdown(
-        "Query enterprise business rules, metric definitions, database schemas, and delivery policies. "
-        "Every response is strictly grounded in the local **ChromaDB** vector store with citation attribution."
-    )
+    st.subheader("Direct Knowledge Base Semantic Search")
+    st.markdown("Queries ChromaDB vector documentation directly.")
 
-    # Status indicator
-    rag_status = rag_pipeline.get_status()
-    total_vectors = rag_status["vector_store"]["total_chunks"]
-    st.info(f"📚 Vector Knowledge Base: **{total_vectors} chunks** indexed in ChromaDB using **nomic-embed-text**.")
-
-    RAG_EXAMPLES = [
-        "How is customer retention calculated?",
-        "What is the definition of average order value?",
-        "Explain the database schema and star model",
-        "What does a delivered order mean in this project?",
-        "What are the delivery lead time policies and SLAs?",
-        "How do delivery delays impact customer review scores?",
-    ]
-
-    selected_rag = st.selectbox("💡 Example Knowledge Questions:", ["-- Custom Question --"] + RAG_EXAMPLES, key="rag_select")
-    user_rag_query = st.text_input(
-        "Enter your knowledge or policy question:",
-        value="" if selected_rag.startswith("--") else selected_rag,
-        key="rag_input",
-    )
-
-    col1, col2 = st.columns([1, 4])
-    with col1:
-        top_k = st.slider("Citations (Top K):", min_value=1, max_value=6, value=4)
-
-    if st.button("🔍 Search Knowledge Base", type="primary", key="btn_rag"):
-        if not user_rag_query:
-            st.warning("Please enter or select a question.")
+    rag_q = st.text_input("Enter domain question:", key="direct_rag_input", value="How is customer retention calculated?")
+    if st.button("Search Knowledge Base", key="btn_direct_rag"):
+        with st.spinner("Retrieving from ChromaDB..."):
+            out = tool_registry.execute_tool("rag_retrieval_tool", query=rag_q, top_k=3, synthesize_answer=True)
+        if out["success"]:
+            st.success(f"Completed in {out['execution_time_seconds']}s")
+            st.markdown(out["answer"])
+            for c in out["citations"]:
+                st.caption(f"Source: `{c['source']}` — {c['section']}")
         else:
-            with st.spinner("Retrieving semantic vectors and synthesizing grounded answer with Qwen 2.5 3B..."):
-                start_t = time.time()
-                grounded_ans = rag_pipeline.answer_question(user_rag_query, top_k=top_k)
-                elapsed = round(time.time() - start_t, 2)
-
-            st.success(f"✅ Grounded Synthesis Complete in {elapsed}s")
-
-            # Answer Card
-            st.markdown("<div class='section-header'>Grounded Answer</div>", unsafe_allow_html=True)
-            st.markdown(grounded_ans.answer)
-
-            if grounded_ans.has_limitation:
-                st.warning("⚠️ **Limitation Notice:** The system detected that the available documentation has limited information regarding this query.")
-
-            # Citations and Context
-            st.markdown("<div class='section-header'>Verified Sources & Citations</div>", unsafe_allow_html=True)
-            for i, citation in enumerate(grounded_ans.citations, 1):
-                pct = int(citation.relevance_score * 100)
-                with st.expander(f"📄 Citation [{i}]: {citation.source} — {citation.section} ({pct}% similarity)"):
-                    st.markdown(f"**Document Title:** {citation.title}")
-                    st.markdown(f"**Chunk ID:** `{citation.chunk_id}`")
-                    st.markdown(f"**Relevance Score:** `{citation.relevance_score:.4f}`")
-                    st.markdown("**Context Excerpt:**")
-                    st.info(citation.snippet)
+            st.error(out["error"])
