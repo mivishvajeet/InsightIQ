@@ -1,0 +1,654 @@
+{
+  "timestamp": "2026-11-18 01:44:27",
+  "total_questions": 35,
+  "passed_questions": 32,
+  "overall_pass_rate_pct": 91.43,
+  "metrics": {
+    "tool_selection_accuracy_pct": 100.0,
+    "execution_success_rate_pct": 100.0,
+    "sql_result_correctness_pct": 91.43,
+    "answer_grounding_pct": 97.14,
+    "error_handling_accuracy_pct": 100.0,
+    "average_latency_seconds": 10.62,
+    "total_duration_seconds": 371.65
+  },
+  "category_breakdown": {
+    "Sales Analytics": {
+      "total": 7,
+      "passed": 5,
+      "pass_rate_pct": 71.43
+    },
+    "Customer Analytics": {
+      "total": 6,
+      "passed": 5,
+      "pass_rate_pct": 83.33
+    },
+    "Operational Analytics": {
+      "total": 5,
+      "passed": 5,
+      "pass_rate_pct": 100.0
+    },
+    "Knowledge Retrieval": {
+      "total": 6,
+      "passed": 6,
+      "pass_rate_pct": 100.0
+    },
+    "Business Investigation": {
+      "total": 6,
+      "passed": 6,
+      "pass_rate_pct": 100.0
+    },
+    "Compound / Hybrid": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate_pct": 100.0
+    },
+    "Reports": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate_pct": 100.0
+    },
+    "Edge Cases & Unsupported": {
+      "total": 3,
+      "passed": 3,
+      "pass_rate_pct": 100.0
+    }
+  },
+  "question_scores": [
+    {
+      "question_id": "Q01",
+      "category": "Sales Analytics",
+      "question": "What is the monthly revenue trend?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 26.31,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q02",
+      "category": "Sales Analytics",
+      "question": "Which product category generates the highest sales?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 10.83,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q03",
+      "category": "Sales Analytics",
+      "question": "Compare sales performance across Brazilian states",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 22.8,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q04",
+      "category": "Sales Analytics",
+      "question": "What is the average order value?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 11.27,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q05",
+      "category": "Sales Analytics",
+      "question": "Which month had the highest revenue?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 8.9,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q06",
+      "category": "Sales Analytics",
+      "question": "What is the total delivered revenue of the platform?",
+      "overall_pass": false,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 0.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 8.66,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Score below threshold on one or more dimensions"
+    },
+    {
+      "question_id": "Q07",
+      "category": "Sales Analytics",
+      "question": "What is the total gross merchandise value (GMV) excluding freight?",
+      "overall_pass": false,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 0.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 8.04,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Score below threshold on one or more dimensions"
+    },
+    {
+      "question_id": "Q08",
+      "category": "Customer Analytics",
+      "question": "How many customers made repeat purchases?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 12.54,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q09",
+      "category": "Customer Analytics",
+      "question": "What is the customer retention rate or repeat purchase rate?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 13.29,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q10",
+      "category": "Customer Analytics",
+      "question": "How many unique physical customers exist on the platform?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 7.44,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q11",
+      "category": "Customer Analytics",
+      "question": "What customer segments generate the most revenue?",
+      "overall_pass": false,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 0.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 11.09,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Score below threshold on one or more dimensions"
+    },
+    {
+      "question_id": "Q12",
+      "category": "Customer Analytics",
+      "question": "Identify high-value customers by total monetary spend",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 19.15,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q13",
+      "category": "Customer Analytics",
+      "question": "Perform customer RFM segmentation",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 12.31,
+      "actual_intent": "python",
+      "actual_tools": [
+        "python_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q14",
+      "category": "Operational Analytics",
+      "question": "Which sellers have the highest cancellation rates?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 7.64,
+      "actual_intent": "investigation",
+      "actual_tools": [
+        "business_investigation_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q15",
+      "category": "Operational Analytics",
+      "question": "Are delivery delays associated with lower review scores?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 16.23,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q16",
+      "category": "Operational Analytics",
+      "question": "Calculate Pearson correlation between delivery delay and review score",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 7.95,
+      "actual_intent": "python",
+      "actual_tools": [
+        "python_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q17",
+      "category": "Operational Analytics",
+      "question": "Which product categories have the longest delivery times?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 15.26,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q18",
+      "category": "Operational Analytics",
+      "question": "What is the platform overall on-time delivery rate?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 9.91,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q19",
+      "category": "Knowledge Retrieval",
+      "question": "How is customer retention calculated?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 9.89,
+      "actual_intent": "rag",
+      "actual_tools": [
+        "rag_retrieval_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q20",
+      "category": "Knowledge Retrieval",
+      "question": "What is the definition of average order value?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 4.0,
+      "actual_intent": "rag",
+      "actual_tools": [
+        "rag_retrieval_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q21",
+      "category": "Knowledge Retrieval",
+      "question": "Explain the database schema and table relationships",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 18.11,
+      "actual_intent": "rag",
+      "actual_tools": [
+        "rag_retrieval_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q22",
+      "category": "Knowledge Retrieval",
+      "question": "What does a delivered order mean in this project?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 8.85,
+      "actual_intent": "rag",
+      "actual_tools": [
+        "rag_retrieval_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q23",
+      "category": "Knowledge Retrieval",
+      "question": "What are the delivery policies and estimated delivery date rules?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 9.58,
+      "actual_intent": "rag",
+      "actual_tools": [
+        "rag_retrieval_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q24",
+      "category": "Knowledge Retrieval",
+      "question": "What is the difference between customer_id and customer_unique_id?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 5.27,
+      "actual_intent": "rag",
+      "actual_tools": [
+        "rag_retrieval_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q25",
+      "category": "Business Investigation",
+      "question": "Why did revenue decline in a particular period?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 10.23,
+      "actual_intent": "investigation",
+      "actual_tools": [
+        "business_investigation_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q26",
+      "category": "Business Investigation",
+      "question": "What factors are associated with declining customer satisfaction?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 11.21,
+      "actual_intent": "investigation",
+      "actual_tools": [
+        "business_investigation_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q27",
+      "category": "Business Investigation",
+      "question": "Which categories are underperforming?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 0.5,
+      "error_handling_score": 1.0,
+      "latency_seconds": 8.57,
+      "actual_intent": "investigation",
+      "actual_tools": [
+        "business_investigation_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q28",
+      "category": "Business Investigation",
+      "question": "What should the business investigate next?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 0.5,
+      "error_handling_score": 1.0,
+      "latency_seconds": 9.46,
+      "actual_intent": "investigation",
+      "actual_tools": [
+        "business_investigation_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q29",
+      "category": "Business Investigation",
+      "question": "Detect statistical revenue anomalies and spikes",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 7.18,
+      "actual_intent": "python",
+      "actual_tools": [
+        "python_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q30",
+      "category": "Business Investigation",
+      "question": "Investigate problematic sellers with high cancellation rates",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 8.72,
+      "actual_intent": "investigation",
+      "actual_tools": [
+        "business_investigation_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q31",
+      "category": "Compound / Hybrid",
+      "question": "What is our delivered revenue and how is it defined?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 7.21,
+      "actual_intent": "rag",
+      "actual_tools": [
+        "rag_retrieval_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q32",
+      "category": "Reports",
+      "question": "Generate business performance report",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 0.94,
+      "actual_intent": "report",
+      "actual_tools": [
+        "report_generation_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q33",
+      "category": "Edge Cases & Unsupported",
+      "question": "What is the stock ticker symbol for Apple on NASDAQ?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 1.66,
+      "actual_intent": "rag",
+      "actual_tools": [
+        "rag_retrieval_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q34",
+      "category": "Edge Cases & Unsupported",
+      "question": "What were our total sales in the year 2035?",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 14.51,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    },
+    {
+      "question_id": "Q35",
+      "category": "Edge Cases & Unsupported",
+      "question": "DROP TABLE analytics.fact_orders CASCADE;",
+      "overall_pass": true,
+      "tool_selection_score": 1.0,
+      "execution_success": true,
+      "correctness_score": 1.0,
+      "grounding_score": 1.0,
+      "error_handling_score": 1.0,
+      "latency_seconds": 6.56,
+      "actual_intent": "sql",
+      "actual_tools": [
+        "sql_analytics_tool"
+      ],
+      "notes": "Pass"
+    }
+  ]
+}
