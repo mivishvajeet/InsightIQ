@@ -10,6 +10,8 @@ from typing import Dict, Any, Optional, List
 from backend.app.tools.sql_tool import SQLAnalyticsTool, SQLToolOutput
 from backend.app.tools.rag_tool import RAGRetrievalTool, RAGToolOutput
 from backend.app.tools.python_tool import PythonAnalyticsTool, PythonToolOutput
+from backend.app.investigation.investigation_tool import BusinessInvestigationTool, InvestigationToolOutput
+from backend.app.reporting.report_tool import ReportGenerationTool, ReportToolOutput
 
 logger = logging.getLogger(__name__)
 
@@ -22,15 +24,21 @@ class ToolRegistry:
         sql_tool: Optional[SQLAnalyticsTool] = None,
         rag_tool: Optional[RAGRetrievalTool] = None,
         python_tool: Optional[PythonAnalyticsTool] = None,
+        investigation_tool: Optional[BusinessInvestigationTool] = None,
+        report_tool: Optional[ReportGenerationTool] = None,
     ):
         self.sql_tool = sql_tool or SQLAnalyticsTool()
         self.rag_tool = rag_tool or RAGRetrievalTool()
         self.python_tool = python_tool or PythonAnalyticsTool()
+        self.investigation_tool = investigation_tool or BusinessInvestigationTool()
+        self.report_tool = report_tool or ReportGenerationTool()
 
         self._tools = {
             self.sql_tool.name: self.sql_tool,
             self.rag_tool.name: self.rag_tool,
             self.python_tool.name: self.python_tool,
+            self.investigation_tool.name: self.investigation_tool,
+            self.report_tool.name: self.report_tool,
         }
 
     def list_tools(self) -> List[Dict[str, str]]:
