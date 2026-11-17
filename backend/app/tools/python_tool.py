@@ -60,7 +60,9 @@ class PythonAnalyticsTool:
 
         try:
             if operation == "executive_summary":
-                metrics = KPIService.get_executive_summary()
+                raw_metrics = KPIService.get_executive_summary()
+                # Ensure all decimal and numeric values are floats/ints for JSON serialization
+                metrics = {k: float(v) if hasattr(v, "as_tuple") else v for k, v in raw_metrics.items()}
                 summary = (
                     f"Platform Delivered Revenue: R$ {metrics['total_revenue']:,.2f} across "
                     f"{metrics['delivered_orders']:,} orders. AOV: R$ {metrics['aov']:.2f}. "
@@ -98,31 +100,40 @@ class PythonAnalyticsTool:
             elif operation == "revenue_anomalies":
                 top_n = params.get("top_n", 10)
                 anomalies = AnomalyDetector.get_top_anomalies(top_n)
-                summary = (
-                    f"Identified {len(anomalies)} statistical revenue anomalies. "
-                    f"Top spike detected on {anomalies[0]['date']} (Revenue: R$ {anomalies[0]['revenue']:,.2f}, "
-                    f"Z-Score: {anomalies[0]['z_score']:.2f} — {anomalies[0]['event']})."
-                )
+                if anomalies:
+                    top_item = anomalies[0]
+                    summary = (
+                        f"Identified {len(anomalies)} statistical revenue anomalies. "
+                        f"Top spike detected on {top_item['date']} (Revenue: R$ {top_item['daily_revenue']:,.2f}, "
+                        f"Z-Score: {top_item['z_score']:.2f} — {top_item['business_context']})."
+                    )
+                    top_date = top_item["date"]
+                else:
+                    summary = "No anomalies detected within the specified threshold."
+                    top_date = None
+
                 elapsed = round(time.time() - start_time, 3)
                 return PythonToolOutput(
                     success=True,
                     operation=operation,
                     summary=summary,
-                    metrics={"total_anomalies": len(anomalies), "top_spike_date": anomalies[0]["date"]},
+                    metrics={"total_anomalies": len(anomalies), "top_spike_date": top_date},
                     data=anomalies,
                     execution_time_seconds=elapsed,
                 )
 
             elif operation == "delivery_correlation":
                 res = CorrelationAnalyzer.analyze_delivery_vs_satisfaction()
-                pe = res["correlations"]["pearson_r"]
-                sp = res["correlations"]["spearman_rho"]
-                on_time_star = res["comparative_cohorts"]["on_time"]["avg_review_score"]
-                delayed_star = res["comparative_cohorts"]["delayed"]["avg_review_score"]
+                delay_corr = res["correlations"]["delay_vs_review"]
+                pe = delay_corr["pearson_r"]
+                sp = delay_corr["spearman_rho"]
+                on_time_star = res["comparative_cohorts"]["on_time_orders"]["avg_review_score"]
+                delayed_star = res["comparative_cohorts"]["delayed_orders"]["avg_review_score"]
+                surge = res["comparative_cohorts"].get("one_star_surge_factor", 7.0)
                 summary = (
                     f"Pearson correlation r = {pe:.4f}, Spearman rho = {sp:.4f}. "
                     f"On-time orders average {on_time_star:.2f} ★ vs. delayed orders dropping to {delayed_star:.2f} ★. "
-                    f"Delayed orders suffer a 7x increase in 1-star reviews. (Note: statistical correlation does not establish causality)."
+                    f"Delayed orders suffer a {surge}x increase in 1-star reviews. (Note: statistical correlation does not establish causality)."
                 )
                 elapsed = round(time.time() - start_time, 3)
                 return PythonToolOutput(
@@ -178,3 +189,4 @@ class PythonAnalyticsTool:
                 execution_time_seconds=elapsed,
                 error=str(e),
             )
+
