@@ -86,3 +86,34 @@ class RAGStatusResponse(BaseModel):
     vector_store: Dict[str, Any]
     llm_available: bool
 
+
+class ExecutionStepModel(BaseModel):
+    step_number: int
+    step_name: str
+    tool_name: Optional[str] = None
+    description: str
+    status: str
+    duration_seconds: float
+
+
+class AgentQueryRequest(BaseModel):
+    question: str = Field(..., description="Natural language business question", json_schema_extra={"example": "What is the monthly revenue trend and how is delivered revenue defined?"})
+    mode_override: Optional[str] = Field(None, description="Optional tool override: 'sql', 'rag', 'python', 'hybrid', or 'auto'")
+    top_k: int = Field(4, ge=1, le=10)
+
+
+class AgentQueryResponse(BaseModel):
+    question: str
+    final_answer: str
+    intent: str
+    tools_used: List[str]
+    execution_steps: List[ExecutionStepModel]
+    tool_outputs: Dict[str, Any]
+    sql_query: Optional[str] = None
+    data_table: List[Dict[str, Any]] = []
+    columns: List[str] = []
+    citations: List[CitationModel] = []
+    total_execution_time_seconds: float
+    error: Optional[str] = None
+
+

@@ -14,6 +14,8 @@ from backend.app.api.schemas import (
     RAGQueryRequest,
     RAGQueryResponse,
     RAGStatusResponse,
+    AgentQueryRequest,
+    AgentQueryResponse,
 )
 from backend.app.services.kpi_service import KPIService
 from backend.app.services.anomaly_detector import AnomalyDetector
@@ -21,6 +23,8 @@ from backend.app.services.correlation_analyzer import CorrelationAnalyzer
 from backend.app.services.customer_analytics import CustomerAnalyticsService
 from backend.app.services.sql_generator import SQLGenerator
 from backend.app.rag.pipeline import rag_pipeline
+from backend.app.agents.orchestrator import orchestrator_agent
+from backend.app.tools.registry import tool_registry
 
 router = APIRouter(prefix="/api", tags=["Analytics & AI"])
 sql_generator = SQLGenerator()
@@ -167,4 +171,28 @@ def ask_knowledge_base(req: RAGQueryRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"RAG query error: {e}")
+
+
+@router.get("/agent/tools")
+def list_registered_agent_tools():
+    """Lists all specialized tools available to the orchestrator agent."""
+    return tool_registry.list_tools()
+
+
+@router.post("/agent/query", response_model=AgentQueryResponse)
+def execute_agent_query(req: AgentQueryRequest):
+    """
+    Executes the full agentic multi-tool workflow: intent classification,
+    tool execution (SQL, RAG, Python), step tracing, and evidence synthesis.
+    """
+    try:
+        result = orchestrator_agent.run(
+            question=req.question,
+            mode_override=req.mode_override,
+            top_k=req.top_k,
+        )
+        return AgentQueryResponse(**result.to_dict())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Agent orchestration failed: {e}")
+
 

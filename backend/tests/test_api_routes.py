@@ -96,3 +96,30 @@ def test_api_rag_query():
     assert len(data["citations"]) >= 1
 
 
+def test_api_agent_tools():
+    response = client.get("/api/agent/tools")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) >= 3
+    tool_names = [t["name"] for t in data]
+    assert "sql_analytics_tool" in tool_names
+    assert "rag_retrieval_tool" in tool_names
+    assert "python_analytics_tool" in tool_names
+
+
+def test_api_agent_query():
+    payload = {
+        "question": "What is our delivered revenue and how is it defined?",
+        "mode_override": "hybrid",
+        "top_k": 2,
+    }
+    response = client.post("/api/agent/query", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["final_answer"]) > 20
+    assert len(data["execution_steps"]) >= 3
+    assert "rag_retrieval_tool" in data["tools_used"]
+    assert "sql_analytics_tool" in data["tools_used"]
+
+
+
