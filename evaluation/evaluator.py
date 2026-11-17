@@ -163,17 +163,29 @@ class BenchmarkEvaluator:
             scores.append(score)
 
         total_elapsed = round(time.time() - start_suite, 2)
+        report = self.aggregate_scores(scores, total_elapsed=total_elapsed)
 
-        # Aggregate Statistics
+        # Save report
+        out_file = RESULTS_DIR / "latest_evaluation.json"
+        with open(out_file, "w", encoding="utf-8") as f:
+            json.dump(report, f, indent=2)
+
+        logger.info(f"Evaluation report written to {out_file} (Pass Rate: {report['overall_pass_rate_pct']}%)")
+        return report
+
+    @staticmethod
+    def aggregate_scores(scores: List[QuestionEvaluationScore], total_elapsed: float = 0.0) -> Dict[str, Any]:
+        """Aggregates an arbitrary list of QuestionEvaluationScore items into a scorecard report dictionary."""
+        total_q = len(scores)
         passed_count = sum(1 for s in scores if s.overall_pass)
         pass_rate_pct = round((passed_count / total_q) * 100.0, 2) if total_q > 0 else 0.0
 
-        avg_tool_selection = round(sum(s.tool_selection_score for s in scores) / total_q * 100.0, 2)
-        avg_execution_success = round(sum(1 for s in scores if s.execution_success) / total_q * 100.0, 2)
-        avg_correctness = round(sum(s.correctness_score for s in scores) / total_q * 100.0, 2)
-        avg_grounding = round(sum(s.grounding_score for s in scores) / total_q * 100.0, 2)
-        avg_error_handling = round(sum(s.error_handling_score for s in scores) / total_q * 100.0, 2)
-        avg_latency = round(sum(s.latency_seconds for s in scores) / total_q, 2)
+        avg_tool_selection = round(sum(s.tool_selection_score for s in scores) / total_q * 100.0, 2) if total_q > 0 else 0.0
+        avg_execution_success = round(sum(1 for s in scores if s.execution_success) / total_q * 100.0, 2) if total_q > 0 else 0.0
+        avg_correctness = round(sum(s.correctness_score for s in scores) / total_q * 100.0, 2) if total_q > 0 else 0.0
+        avg_grounding = round(sum(s.grounding_score for s in scores) / total_q * 100.0, 2) if total_q > 0 else 0.0
+        avg_error_handling = round(sum(s.error_handling_score for s in scores) / total_q * 100.0, 2) if total_q > 0 else 0.0
+        avg_latency = round(sum(s.latency_seconds for s in scores) / total_q, 2) if total_q > 0 else 0.0
 
         # Category level aggregation
         cat_breakdown: Dict[str, Dict[str, Any]] = {}
@@ -187,7 +199,7 @@ class BenchmarkEvaluator:
         for c, data in cat_breakdown.items():
             data["pass_rate_pct"] = round(data["passed"] / data["total"] * 100.0, 2)
 
-        report = {
+        return {
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "total_questions": total_q,
             "passed_questions": passed_count,
@@ -205,11 +217,4 @@ class BenchmarkEvaluator:
             "question_scores": [s.to_dict() for s in scores],
         }
 
-        # Save report
-        out_file = RESULTS_DIR / "latest_evaluation.json"
-        with open(out_file, "w", encoding="utf-8") as f:
-            json.dump(report, f, indent=2)
-
-        logger.info(f"Evaluation report written to {out_file} (Pass Rate: {pass_rate_pct}%)")
-        return report
 

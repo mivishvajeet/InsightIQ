@@ -251,10 +251,11 @@ def run_evaluation_benchmark(req: EvaluationRunRequest):
     try:
         from evaluation.evaluator import BenchmarkEvaluator
         evaluator = BenchmarkEvaluator()
-        scorecard = evaluator.run_benchmark(category=req.category, limit=req.limit)
-        return EvaluationScorecardResponse(**scorecard.to_dict())
+        report = evaluator.run_benchmark(category=req.category, limit=req.limit)
+        return EvaluationScorecardResponse(**report)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Evaluation execution failed: {e}")
+
 
 
 
