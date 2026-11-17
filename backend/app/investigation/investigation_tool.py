@@ -199,3 +199,4 @@ class BusinessInvestigationTool:
                 execution_time_seconds=elapsed,
                 error=str(e),
             )
+

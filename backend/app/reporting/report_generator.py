@@ -74,7 +74,7 @@ class ReportGeneratorService:
 ## 4. Customer Segmentation Overview (Top RFM Segments)
 """
         for s in rfm:
-            markdown_report += f"* **{s['customer_segment']}:** {s['customer_count']:,} customers ({s['pct_of_customers']}%) — Total Monetary Value: R$ {s['total_monetary_value']:,.2f} (Avg Order: R$ {s['avg_monetary_value']:.2f})\n"
+            markdown_report += f"* **{s['customer_segment']}:** {s['customer_count']:,} customers ({s.get('customer_pct', 0.0)}%) — Total Revenue: R$ {s.get('total_revenue', 0.0):,.2f} (Avg Order: R$ {s.get('avg_monetary', 0.0):.2f})\n"
 
         markdown_report += f"""
 ---
@@ -98,3 +98,4 @@ class ReportGeneratorService:
                 "Strategic Recommendations",
             ],
         }
+

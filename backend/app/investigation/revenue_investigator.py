@@ -187,7 +187,7 @@ class RevenueAnomalyInvestigator:
                 ROUND(AVG(fo.total_order_amount), 2) AS daily_aov
             FROM analytics.fact_orders fo
             JOIN analytics.dim_date d ON fo.purchase_date_key = d.date_key
-            WHERE fo.is_delivered = TRUE AND d.full_date = :dt
+            WHERE fo.is_delivered = TRUE AND d.full_date = CAST(:dt AS DATE)
             GROUP BY d.full_date;
             """
         )
@@ -206,8 +206,8 @@ class RevenueAnomalyInvestigator:
                 FROM analytics.fact_orders fo
                 JOIN analytics.dim_date d ON fo.purchase_date_key = d.date_key
                 WHERE fo.is_delivered = TRUE
-                  AND d.full_date >= (:dt::date - INTERVAL '30 days')
-                  AND d.full_date < :dt::date
+                  AND d.full_date >= (CAST(:dt AS DATE) - INTERVAL '30 days')
+                  AND d.full_date < CAST(:dt AS DATE)
                 GROUP BY d.full_date
             ) sub;
             """
@@ -246,3 +246,4 @@ class RevenueAnomalyInvestigator:
                 f"compared to the preceding 30-day baseline (mean daily revenue: R$ {base_rev:,.2f})."
             ),
         }
+

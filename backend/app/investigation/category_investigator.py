@@ -64,3 +64,4 @@ class CategoryPerformanceInvestigator:
             "underperforming_categories": records,
             "executive_summary": summary,
         }
+

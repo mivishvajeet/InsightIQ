@@ -73,3 +73,4 @@ class ReportGenerationTool:
                 execution_time_seconds=elapsed,
                 error=str(e),
             )
+

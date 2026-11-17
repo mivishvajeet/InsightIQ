@@ -96,8 +96,10 @@ class SatisfactionDriverInvestigator:
             "geographic_logistics": geo_list,
             "executive_summary": executive_summary,
             "causation_guardrail": (
-                "IMPORTANT: Statistical correlation does not prove delivery delay is the sole root cause. "
-                "Seller communication latency, defective products, or shipping package damage can also co-occur with delays. "
+                "IMPORTANT: Statistical correlation does not prove causation. "
+                "Delivery delay is a critical driver but not the sole root cause of dissatisfaction; "
+                "seller communication latency, defective products, or shipping package damage can also co-occur with delays. "
                 "Hypotheses must be validated through qualitative review text mining."
             ),
         }
+
