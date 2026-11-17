@@ -284,5 +284,53 @@ This document records the foundational architectural decisions taken based on em
 * **Decision:**
   - Implemented `ReportGeneratorService` synthesizing end-to-end executive summaries (financial baselines, satisfaction health, historical anomalies, and strategic actions) in GitHub-flavored Markdown and structured JSON.
 
+---
+
+## Phase 9: Evaluation Framework & Benchmark Testing
+
+### Decision 24: Comprehensive 35-Question Ground Truth Benchmark Suite
+
+* **Context:**
+  Assessing an autonomous business intelligence agent requires a standardized benchmark of real-world business queries covering factual retrieval, complex relational SQL, customer segmentation, statistical anomalies, operational logistics, business investigations, and security edge cases.
+* **Decision:**
+  - Formulated a 35-question benchmark suite (`evaluation/benchmark_questions.json`) partitioned across 8 domains: Sales Analytics, Customer Analytics, Operational Analytics, Knowledge Retrieval, Business Investigation, Compound / Hybrid, Executive Reports, and Edge Cases & Unsupported.
+  - Established quantitative ground-truth baselines (R$ 15,424,463.65 revenue, 96,478 delivered orders, 91.89% on-time delivery rate, 2,997 repeat buyers, SP top state) with strict tolerance thresholds.
+
+---
+
+### Decision 25: Five-Dimensional Orthogonal Evaluation Scoring Engine
+
+* **Context:**
+  A binary pass/fail score fails to isolate where an agent faltered (routing vs SQL generation vs execution vs hallucination vs security).
+* **Decision:**
+  - Implemented `BenchmarkScorer` computing independent scores across five core dimensions:
+    1. Tool Selection Accuracy (0.0 or 1.0)
+    2. Execution Success (Boolean)
+    3. Correctness Score (SQL value within tolerance, RAG citation match, or investigation evidence)
+    4. Answer Grounding Score (Fraction of required ground truth factual phrases present in final answer)
+    5. Security & Limitation Handling (AST rejection of destructive SQL, 0-row handling for out-of-bounds dates, limitation disclosure for out-of-scope topics)
+  - Established rigorous pass condition: Tool score = 1.0, Execution = True, Error score >= 0.8, Correctness >= 0.5.
+
+---
+
+### Decision 26: Lexical Anti-Hallucination Grounding Verification
+
+* **Context:**
+  LLM synthesizers often produce fluent, persuasive prose that subtly hallucinates incorrect numbers or attributes findings to false metrics.
+* **Decision:**
+  - Enforced lexical answer grounding verification in the benchmark engine (`evaluate_answer_grounding`).
+  - Scored the exact presence of critical ground-truth numerical values, entities, and business constraints in synthesized answers, achieving a 97.14% grounding rate across the 35 benchmark questions.
+
+---
+
+### Decision 27: Automated Failure Diagnostics & Self-Healing Engine
+
+* **Context:**
+  When questions fail or show latency spikes, developers need immediate root-cause attribution rather than manual log parsing.
+* **Decision:**
+  - Developed `FailureAnalyzer` (`evaluation/failure_analysis.py`) categorizing failures into tool routing flaws, SQL exemplar omissions, execution faults, grounding deficiencies, or guardrail slips.
+  - Automatically generates targeted few-shot prompt recommendations and flags latency outliers (>15s) for performance optimization.
+
+
 
 

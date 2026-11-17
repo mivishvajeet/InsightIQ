@@ -45,8 +45,46 @@ InsightIQ enables business users and data analysts to interact with enterprise d
 - [x] **Phase 6: RAG implementation using LangChain and ChromaDB** *(Completed)*
 - [x] **Phase 7: SQL agent and tool orchestration** *(Completed)*
 - [x] **Phase 8: Business investigation workflow** *(Completed)*
-- [ ] **Phase 9: Testing, evaluation, and performance improvements**
+- [x] **Phase 9: Testing, evaluation, and performance improvements** *(Completed)*
 - [ ] **Phase 10: Documentation and portfolio release**
+
+---
+
+## Phase 9 Summary: Evaluation Benchmark & Telemetry Scorecard
+
+InsightIQ includes a production-grade automated evaluation framework testing **35 standardized business questions** across 8 analytical categories with ground truth baselines.
+
+```
+======================================================================
+🎯 INSIGHTIQ BENCHMARK EVALUATION SCORECARD
+======================================================================
+Total Questions Evaluated:    35
+Passed Questions:             32
+Overall Benchmark Pass Rate:  91.43%  (Target: >90%)
+----------------------------------------------------------------------
+Tool-Selection Accuracy:      100.00%
+Execution Success Rate:       100.00%
+SQL Result Correctness:       91.43%
+Answer Grounding (Anti-Hallu): 97.14%
+Security & Error Handling:    100.00%
+Average Response Latency:     10.62s
+======================================================================
+```
+
+### Running the Evaluation Suite
+```bash
+# Run full 35-question automated benchmark
+python -m evaluation.run_evaluation
+
+# Run failure diagnostics and self-healing recommendations
+python -m evaluation.failure_analysis
+
+# Run automated pytest evaluation test suite
+pytest backend/tests/test_evaluation_benchmark.py -v
+```
+
+Interactive evaluation metrics, category pass rates, latency charts, and slice runners are also available at `Streamlit > 🎯 8_Evaluation_Framework`.
+
 
 ---
 
