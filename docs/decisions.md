@@ -167,3 +167,39 @@ This document records the foundational architectural decisions taken based on em
   - Enriched system prompts with concrete few-shot exemplars mapping natural language questions to approved analytics views.
   - Built `generate_and_execute` with an automated self-healing retry loop: if PostgreSQL returns a syntax or column error, the error traceback is reflected back to Qwen to self-correct in real time.
   - Enforced deterministic temperature ($T = 0.0$) for SQL generation to guarantee reproducible queries.
+
+---
+
+## Phase 6: RAG Implementation with LangChain and ChromaDB
+
+### Decision 14: Local Vector Embedding Architecture (Nomic Embed Text & ChromaDB)
+
+* **Context:**
+  The platform must run locally without paid cloud APIs (e.g. OpenAI or Pinecone) while delivering enterprise-grade semantic retrieval over domain business rules, schema specs, and KPI formulas.
+* **Decision:**
+  - Selected `nomic-embed-text` running locally inside Ollama (`http://localhost:11434`), delivering 768-dimensional normalized vectors with 2,048 token context window.
+  - Selected `ChromaDB` (v1.5.9) as the persistent vector database stored locally at `data/processed/chroma_db/`.
+  - ChromaDB operates embedded in Python with zero external infrastructure overhead, sub-millisecond similarity lookups, and metadata filtering.
+
+---
+
+### Decision 15: Section-Aware Markdown Chunking Strategy
+
+* **Context:**
+  Naively chunking business documents at arbitrary character boundaries splits mathematical formulas, SQL logic, and metric definitions mid-sentence, degrading semantic retrieval relevance.
+* **Decision:**
+  - Implemented `MarkdownTextSplitter` with prioritized markdown separators (`["\n## ", "\n### ", "\n#### ", "\n\n", "\n- ", "\n", " "]`).
+  - Chunks sized to 600 characters with 120 character overlap, preserving complete formula blocks and bulleted rule sets.
+  - Enriched each chunk with deterministic metadata: `source` filename, `title`, `section` header, `chunk_id` (`{source}#chunk-{i:03d}`), and `word_count`.
+
+---
+
+### Decision 16: Strict Grounding, Source Attribution, & Explicit Limitation Disclosures
+
+* **Context:**
+  Business users require high-confidence answers. Hallucinating metric definitions or business rules creates operational risk.
+* **Decision:**
+  - Designed `RAG_SYSTEM_PROMPT` with strict negative constraints: answers must solely derive from retrieved chunks.
+  - Enforced structured citation modeling (`Citation` and `RetrievalResult`) with document names, section headers, and normalized similarity percentages.
+  - Required explicit disclosure of limitations: if the query falls outside the knowledge base (e.g., stock prices, external market data), the system transparently reports: "The available InsightIQ documentation does not contain information regarding this topic."
+
