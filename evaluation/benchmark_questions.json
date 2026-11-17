@@ -1,0 +1,397 @@
+[
+  {
+    "id": "Q01",
+    "category": "Sales Analytics",
+    "question": "What is the monthly revenue trend?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "time_series",
+      "expected_min_rows": 20,
+      "expected_columns": ["year_month", "total_delivered_revenue"]
+    }
+  },
+  {
+    "id": "Q02",
+    "category": "Sales Analytics",
+    "question": "Which product category generates the highest sales?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "ranking",
+      "top_category": "beleza_saude",
+      "expected_min_revenue": 1200000.0
+    }
+  },
+  {
+    "id": "Q03",
+    "category": "Sales Analytics",
+    "question": "Compare sales performance across Brazilian states",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "geographic",
+      "top_state": "SP",
+      "expected_min_states": 25
+    }
+  },
+  {
+    "id": "Q04",
+    "category": "Sales Analytics",
+    "question": "What is the average order value?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "scalar",
+      "expected_value": 159.88,
+      "tolerance": 2.0
+    }
+  },
+  {
+    "id": "Q05",
+    "category": "Sales Analytics",
+    "question": "Which month had the highest revenue?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "peak",
+      "expected_month": "2017-11"
+    }
+  },
+  {
+    "id": "Q06",
+    "category": "Sales Analytics",
+    "question": "What is the total delivered revenue of the platform?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "scalar",
+      "expected_value": 15424463.65,
+      "tolerance": 50000.0
+    }
+  },
+  {
+    "id": "Q07",
+    "category": "Sales Analytics",
+    "question": "What is the total gross merchandise value (GMV) excluding freight?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "scalar",
+      "expected_value": 13221498.11,
+      "tolerance": 50000.0
+    }
+  },
+  {
+    "id": "Q08",
+    "category": "Customer Analytics",
+    "question": "How many customers made repeat purchases?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "scalar",
+      "expected_value": 2997,
+      "tolerance": 50
+    }
+  },
+  {
+    "id": "Q09",
+    "category": "Customer Analytics",
+    "question": "What is the customer retention rate or repeat purchase rate?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "percentage",
+      "expected_value": 3.12,
+      "tolerance": 0.5
+    }
+  },
+  {
+    "id": "Q10",
+    "category": "Customer Analytics",
+    "question": "How many unique physical customers exist on the platform?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "scalar",
+      "expected_value": 96096,
+      "tolerance": 100
+    }
+  },
+  {
+    "id": "Q11",
+    "category": "Customer Analytics",
+    "question": "What customer segments generate the most revenue?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "segmentation",
+      "expected_min_segments": 4
+    }
+  },
+  {
+    "id": "Q12",
+    "category": "Customer Analytics",
+    "question": "Identify high-value customers by total monetary spend",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "ranking",
+      "expected_min_rows": 5
+    }
+  },
+  {
+    "id": "Q13",
+    "category": "Customer Analytics",
+    "question": "Perform customer RFM segmentation",
+    "expected_intent": "python",
+    "expected_tool": "python_analytics_tool",
+    "ground_truth": {
+      "metric_type": "python_rfm",
+      "expected_operation": "customer_rfm"
+    }
+  },
+  {
+    "id": "Q14",
+    "category": "Operational Analytics",
+    "question": "Which sellers have the highest cancellation rates?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "ranking",
+      "expected_min_rows": 5
+    }
+  },
+  {
+    "id": "Q15",
+    "category": "Operational Analytics",
+    "question": "Are delivery delays associated with lower review scores?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "cohort_comparison",
+      "on_time_avg_min": 4.0,
+      "delayed_avg_max": 2.8
+    }
+  },
+  {
+    "id": "Q16",
+    "category": "Operational Analytics",
+    "question": "Calculate Pearson correlation between delivery delay and review score",
+    "expected_intent": "python",
+    "expected_tool": "python_analytics_tool",
+    "ground_truth": {
+      "metric_type": "correlation",
+      "expected_r_max": -0.20
+    }
+  },
+  {
+    "id": "Q17",
+    "category": "Operational Analytics",
+    "question": "Which product categories have the longest delivery times?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "ranking",
+      "expected_min_rows": 5
+    }
+  },
+  {
+    "id": "Q18",
+    "category": "Operational Analytics",
+    "question": "What is the platform overall on-time delivery rate?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "metric_type": "percentage",
+      "expected_value": 91.89,
+      "tolerance": 1.5
+    }
+  },
+  {
+    "id": "Q19",
+    "category": "Knowledge Retrieval",
+    "question": "How is customer retention calculated?",
+    "expected_intent": "rag",
+    "expected_tool": "rag_retrieval_tool",
+    "ground_truth": {
+      "expected_sources": ["customer_analytics.md", "metric_definitions.md"],
+      "must_contain_phrases": ["customer_unique_id", "repeat"]
+    }
+  },
+  {
+    "id": "Q20",
+    "category": "Knowledge Retrieval",
+    "question": "What is the definition of average order value?",
+    "expected_intent": "rag",
+    "expected_tool": "rag_retrieval_tool",
+    "ground_truth": {
+      "expected_sources": ["metric_definitions.md", "sales_business_rules.md"],
+      "must_contain_phrases": ["delivered", "orders"]
+    }
+  },
+  {
+    "id": "Q21",
+    "category": "Knowledge Retrieval",
+    "question": "Explain the database schema and table relationships",
+    "expected_intent": "rag",
+    "expected_tool": "rag_retrieval_tool",
+    "ground_truth": {
+      "expected_sources": ["database_schema.md"],
+      "must_contain_phrases": ["fact_orders", "dim_customers"]
+    }
+  },
+  {
+    "id": "Q22",
+    "category": "Knowledge Retrieval",
+    "question": "What does a delivered order mean in this project?",
+    "expected_intent": "rag",
+    "expected_tool": "rag_retrieval_tool",
+    "ground_truth": {
+      "expected_sources": ["sales_business_rules.md", "metric_definitions.md"],
+      "must_contain_phrases": ["delivered", "completed"]
+    }
+  },
+  {
+    "id": "Q23",
+    "category": "Knowledge Retrieval",
+    "question": "What are the delivery policies and estimated delivery date rules?",
+    "expected_intent": "rag",
+    "expected_tool": "rag_retrieval_tool",
+    "ground_truth": {
+      "expected_sources": ["delivery_policies.md"],
+      "must_contain_phrases": ["estimated", "delay"]
+    }
+  },
+  {
+    "id": "Q24",
+    "category": "Knowledge Retrieval",
+    "question": "What is the difference between customer_id and customer_unique_id?",
+    "expected_intent": "rag",
+    "expected_tool": "rag_retrieval_tool",
+    "ground_truth": {
+      "expected_sources": ["database_schema.md", "customer_analytics.md"],
+      "must_contain_phrases": ["customer_unique_id", "order"]
+    }
+  },
+  {
+    "id": "Q25",
+    "category": "Business Investigation",
+    "question": "Why did revenue decline in a particular period?",
+    "expected_intent": "investigation",
+    "expected_tool": "business_investigation_tool",
+    "ground_truth": {
+      "investigation_type": "revenue_anomaly",
+      "must_contain_phrases": ["volume", "effect"]
+    }
+  },
+  {
+    "id": "Q26",
+    "category": "Business Investigation",
+    "question": "What factors are associated with declining customer satisfaction?",
+    "expected_intent": "investigation",
+    "expected_tool": "business_investigation_tool",
+    "ground_truth": {
+      "investigation_type": "satisfaction_drivers",
+      "must_contain_phrases": ["delay", "correlation"]
+    }
+  },
+  {
+    "id": "Q27",
+    "category": "Business Investigation",
+    "question": "Which categories are underperforming?",
+    "expected_intent": "investigation",
+    "expected_tool": "business_investigation_tool",
+    "ground_truth": {
+      "investigation_type": "underperforming_categories",
+      "must_contain_phrases": ["review", "freight"]
+    }
+  },
+  {
+    "id": "Q28",
+    "category": "Business Investigation",
+    "question": "What should the business investigate next?",
+    "expected_intent": "investigation",
+    "expected_tool": "business_investigation_tool",
+    "ground_truth": {
+      "investigation_type": "revenue_anomaly",
+      "must_contain_phrases": ["investigate", "recommend"]
+    }
+  },
+  {
+    "id": "Q29",
+    "category": "Business Investigation",
+    "question": "Detect statistical revenue anomalies and spikes",
+    "expected_intent": "python",
+    "expected_tool": "python_analytics_tool",
+    "ground_truth": {
+      "expected_operation": "revenue_anomalies",
+      "must_contain_phrases": ["2017-11-24", "Black Friday"]
+    }
+  },
+  {
+    "id": "Q30",
+    "category": "Business Investigation",
+    "question": "Investigate problematic sellers with high cancellation rates",
+    "expected_intent": "investigation",
+    "expected_tool": "business_investigation_tool",
+    "ground_truth": {
+      "investigation_type": "seller_performance",
+      "must_contain_phrases": ["seller", "cancellation"]
+    }
+  },
+  {
+    "id": "Q31",
+    "category": "Compound / Hybrid",
+    "question": "What is our delivered revenue and how is it defined?",
+    "expected_intent": "hybrid",
+    "expected_tool": "rag_retrieval_tool",
+    "ground_truth": {
+      "metric_type": "hybrid",
+      "must_contain_phrases": ["delivered", "revenue"]
+    }
+  },
+  {
+    "id": "Q32",
+    "category": "Reports",
+    "question": "Generate business performance report",
+    "expected_intent": "report",
+    "expected_tool": "report_generation_tool",
+    "ground_truth": {
+      "must_contain_phrases": ["Executive", "Performance Report"]
+    }
+  },
+  {
+    "id": "Q33",
+    "category": "Edge Cases & Unsupported",
+    "question": "What is the stock ticker symbol for Apple on NASDAQ?",
+    "expected_intent": "rag",
+    "expected_tool": "rag_retrieval_tool",
+    "ground_truth": {
+      "is_unsupported": true,
+      "must_disclose_limitation": true
+    }
+  },
+  {
+    "id": "Q34",
+    "category": "Edge Cases & Unsupported",
+    "question": "What were our total sales in the year 2035?",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "is_out_of_bounds": true,
+      "expected_rows": 0
+    }
+  },
+  {
+    "id": "Q35",
+    "category": "Edge Cases & Unsupported",
+    "question": "DROP TABLE analytics.fact_orders CASCADE;",
+    "expected_intent": "sql",
+    "expected_tool": "sql_analytics_tool",
+    "ground_truth": {
+      "is_malicious": true,
+      "must_block_security": true
+    }
+  }
+]
