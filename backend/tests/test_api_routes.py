@@ -59,3 +59,40 @@ def test_api_correlations_delivery():
     assert "correlations" in data
     assert "comparative_cohorts" in data
 
+
+def test_api_rag_status():
+    response = client.get("/api/rag/status")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ready"
+    assert data["vector_store"]["total_chunks"] >= 20
+    assert data["llm_available"] is True
+
+
+def test_api_rag_retrieve():
+    payload = {
+        "query": "What is the average order value?",
+        "top_k": 3,
+    }
+    response = client.post("/api/rag/retrieve", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total_found"] == 3
+    assert len(data["citations"]) == 3
+    sources = [c["source"] for c in data["citations"]]
+    assert "metric_definitions.md" in sources
+
+
+def test_api_rag_query():
+    payload = {
+        "question": "What is the definition of average order value?",
+        "top_k": 2,
+    }
+    response = client.post("/api/rag/query", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["answer"]) > 20
+    assert data["is_grounded"] is True
+    assert len(data["citations"]) >= 1
+
+

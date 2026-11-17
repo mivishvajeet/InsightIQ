@@ -9,12 +9,18 @@ from backend.app.api.schemas import (
     QueryRequest,
     QueryResponse,
     ExecutiveKPIResponse,
+    RAGRetrieveRequest,
+    RAGRetrieveResponse,
+    RAGQueryRequest,
+    RAGQueryResponse,
+    RAGStatusResponse,
 )
 from backend.app.services.kpi_service import KPIService
 from backend.app.services.anomaly_detector import AnomalyDetector
 from backend.app.services.correlation_analyzer import CorrelationAnalyzer
 from backend.app.services.customer_analytics import CustomerAnalyticsService
 from backend.app.services.sql_generator import SQLGenerator
+from backend.app.rag.pipeline import rag_pipeline
 
 router = APIRouter(prefix="/api", tags=["Analytics & AI"])
 sql_generator = SQLGenerator()
@@ -107,3 +113,58 @@ def query_natural_language(req: QueryRequest):
         data=data_records,
         error=error,
     )
+
+
+@router.get("/rag/status", response_model=RAGStatusResponse)
+def get_rag_status():
+    """Returns vector store collection metrics and embedding engine readiness."""
+    try:
+        return rag_pipeline.get_status()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/rag/retrieve", response_model=RAGRetrieveResponse)
+def retrieve_knowledge_context(req: RAGRetrieveRequest):
+    """
+    Performs vector similarity search against ChromaDB, returning retrieved chunks and citations.
+    """
+    try:
+        res = rag_pipeline.retrieve(
+            query=req.query,
+            top_k=req.top_k,
+            category=req.category,
+        )
+        return RAGRetrieveResponse(
+            query=res.query,
+            total_found=res.total_found,
+            citations=[c.to_dict() for c in res.citations],
+            context_text=res.context_text,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Retrieval error: {e}")
+
+
+@router.post("/rag/query", response_model=RAGQueryResponse)
+def ask_knowledge_base(req: RAGQueryRequest):
+    """
+    Synthesizes a context-grounded business answer with structured citations using Qwen 2.5 3B.
+    """
+    try:
+        answer = rag_pipeline.answer_question(
+            question=req.question,
+            top_k=req.top_k,
+            category=req.category,
+            temperature=req.temperature,
+        )
+        return RAGQueryResponse(
+            question=answer.question,
+            answer=answer.answer,
+            citations=[c.to_dict() for c in answer.citations],
+            is_grounded=answer.is_grounded,
+            context_chunks_used=answer.context_chunks_used,
+            has_limitation=answer.has_limitation,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"RAG query error: {e}")
+

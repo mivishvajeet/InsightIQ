@@ -41,3 +41,48 @@ class ExecutiveKPIResponse(BaseModel):
     avg_review_score: float
     avg_delivery_days: float
     on_time_rate_pct: float
+
+
+class CitationModel(BaseModel):
+    source: str
+    title: str
+    section: str
+    chunk_id: str
+    relevance_score: float
+    snippet: str
+
+
+class RAGRetrieveRequest(BaseModel):
+    query: str = Field(..., description="Query for semantic knowledge retrieval", json_schema_extra={"example": "What is the definition of average order value?"})
+    top_k: int = Field(4, ge=1, le=10, description="Number of context chunks to retrieve")
+    category: Optional[str] = Field(None, description="Optional category filter (e.g., metrics, schema, logistics)")
+
+
+class RAGRetrieveResponse(BaseModel):
+    query: str
+    total_found: int
+    citations: List[CitationModel]
+    context_text: str
+
+
+class RAGQueryRequest(BaseModel):
+    question: str = Field(..., description="Business question for grounded RAG answering", json_schema_extra={"example": "How is customer retention calculated?"})
+    top_k: int = Field(4, ge=1, le=10, description="Number of context chunks to retrieve")
+    category: Optional[str] = None
+    temperature: float = Field(0.1, ge=0.0, le=1.0)
+
+
+class RAGQueryResponse(BaseModel):
+    question: str
+    answer: str
+    citations: List[CitationModel]
+    is_grounded: bool
+    context_chunks_used: int
+    has_limitation: bool
+
+
+class RAGStatusResponse(BaseModel):
+    status: str
+    vector_store: Dict[str, Any]
+    llm_available: bool
+
