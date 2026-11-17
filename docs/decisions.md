@@ -237,4 +237,52 @@ This document records the foundational architectural decisions taken based on em
   - Implemented `ExecutionStep` audit logging capturing step index, tool name, execution time, and specific operational descriptions for every agent run.
   - Surfaced this execution trace in both the Streamlit UI and the REST API (`/api/agent/query`), providing analysts with complete transparency into the agent's reasoning path.
 
+---
+
+## Phase 8: Business Investigation Workflows & Executive Reporting
+
+### Decision 20: Mathematical Variance Decomposition for Period-over-Period Changes
+
+* **Context:**
+  When revenue declines or rises, executives require unambiguous clarity on whether shifts stem from sales volume (order counts) or average basket size (AOV).
+* **Decision:**
+  - Implemented `RevenueAnomalyInvestigator` with volume-price variance decomposition:
+    $$\Delta \text{Revenue} = (\Delta \text{Orders} \times \text{AOV}_{\text{prior}}) + (\Delta \text{AOV} \times \text{Orders}_{\text{curr}})$$
+  - Coupled with automated identification of top category and geographic state contributors.
+
+---
+
+### Decision 21: High-Resolution Delay Bracketing & The 3-Day Satisfaction Cliff
+
+* **Context:**
+  A single average delay correlation obscures non-linear consumer tolerance thresholds.
+* **Decision:**
+  - Segmented delivery delays into granular operational tiers:
+    - On-Time / Early: 4.29 ★ (6.6% 1-star)
+    - Minor Delay (1-2 days): 3.73 ★ (13.2% 1-star)
+    - Moderate Delay (3-5 days): 2.60 ★ (45.1% 1-star) — *The Satisfaction Cliff*
+    - Significant Delay (6-10 days): 1.80 ★ (67.2% 1-star)
+    - Severe Delay (> 10 days): 2.59 ★ (45.9% 1-star)
+  - Pinpointed the critical operational SLA threshold: interventions must trigger before day 3 of delay.
+
+---
+
+### Decision 22: Strict Correlation vs Causation Guardrails in Automated Investigations
+
+* **Context:**
+  Automated agents frequently present statistical associations as proven causal root causes (e.g. asserting delivery delay is the sole reason for poor reviews).
+* **Decision:**
+  - Codified mandatory `causation_guardrail` strings across all investigation outputs.
+  - Required that agents explicitly acknowledge co-occurring variables (seller communication, product defects, packaging damage) and frame findings as verified correlations rather than unproven sole causes.
+
+---
+
+### Decision 23: Standardized Markdown & JSON Report Compilation
+
+* **Context:**
+  Business stakeholders require formal briefings that can be immediately exported and distributed.
+* **Decision:**
+  - Implemented `ReportGeneratorService` synthesizing end-to-end executive summaries (financial baselines, satisfaction health, historical anomalies, and strategic actions) in GitHub-flavored Markdown and structured JSON.
+
+
 
