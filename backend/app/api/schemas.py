@@ -142,4 +142,21 @@ class ExecutiveReportResponse(BaseModel):
     sections: List[str]
 
 
+class EvaluationRunRequest(BaseModel):
+    category: Optional[str] = Field(None, description="Optional category filter (e.g., Sales Analytics, Customer Analytics)")
+    limit: Optional[int] = Field(None, ge=1, le=50, description="Optional maximum number of benchmark questions to evaluate")
+
+
+class EvaluationScorecardResponse(BaseModel):
+    timestamp: str
+    total_questions: int
+    passed_questions: int
+    overall_pass_rate_pct: float
+    metrics: Dict[str, Any]
+    category_breakdown: Dict[str, Dict[str, Any]]
+    question_scores: List[Dict[str, Any]]
+
+
+
+
 

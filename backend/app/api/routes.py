@@ -3,6 +3,8 @@ FastAPI Routes for InsightIQ Analytics & AI Agent endpoints.
 """
 
 import time
+import json
+from pathlib import Path
 from typing import Dict, Any, List
 from fastapi import APIRouter, HTTPException
 from backend.app.api.schemas import (
@@ -19,6 +21,8 @@ from backend.app.api.schemas import (
     InvestigationRequest,
     InvestigationResponse,
     ExecutiveReportResponse,
+    EvaluationRunRequest,
+    EvaluationScorecardResponse,
 )
 from backend.app.services.kpi_service import KPIService
 from backend.app.services.anomaly_detector import AnomalyDetector
@@ -224,6 +228,34 @@ def get_executive_report():
         return ExecutiveReportResponse(**data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Report compilation failed: {e}")
+
+
+@router.get("/evaluation/summary", response_model=EvaluationScorecardResponse)
+def get_evaluation_summary():
+    """Retrieves the latest benchmark evaluation scorecard and metrics."""
+    result_path = Path("evaluation/results/latest_evaluation.json")
+    if not result_path.exists():
+        raise HTTPException(status_code=404, detail="No evaluation results found. Run evaluation first.")
+
+    try:
+        with open(result_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return EvaluationScorecardResponse(**data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read evaluation report: {e}")
+
+
+@router.post("/evaluation/run", response_model=EvaluationScorecardResponse)
+def run_evaluation_benchmark(req: EvaluationRunRequest):
+    """Executes the benchmark evaluation on demand and returns the updated scorecard."""
+    try:
+        from evaluation.evaluator import BenchmarkEvaluator
+        evaluator = BenchmarkEvaluator()
+        scorecard = evaluator.run_benchmark(category=req.category, limit=req.limit)
+        return EvaluationScorecardResponse(**scorecard.to_dict())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Evaluation execution failed: {e}")
+
 
 
 
