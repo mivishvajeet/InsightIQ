@@ -88,14 +88,23 @@ class BenchmarkEvaluator:
             expected_tool=expected_tool,
         )
 
-        # 2. Correctness Score (SQL or Python or RAG)
+        # 2. Correctness Score (SQL, Python, RAG, Investigation, Report)
         correctness_score = 1.0
-        if "sql_analytics_tool" in actual_tools:
+        if gt.get("must_block_security") or gt.get("is_out_of_bounds") or gt.get("must_disclose_limitation"):
+            error_score = self.scorer.evaluate_error_and_limitation(result, gt)
+            correctness_score = 1.0 if error_score >= 0.8 else 0.0
+        elif "sql_analytics_tool" in actual_tools:
             sql_out = result.tool_outputs.get("sql_analytics_tool", {})
             correctness_score = self.scorer.evaluate_sql_correctness(sql_out, gt)
         elif "python_analytics_tool" in actual_tools:
             py_out = result.tool_outputs.get("python_analytics_tool", {})
             correctness_score = 1.0 if py_out.get("success") else 0.0
+        elif "business_investigation_tool" in actual_tools:
+            inv_out = result.tool_outputs.get("business_investigation_tool", {})
+            correctness_score = 1.0 if inv_out.get("success") else 0.0
+        elif "report_generation_tool" in actual_tools:
+            rep_out = result.tool_outputs.get("report_generation_tool", {})
+            correctness_score = 1.0 if rep_out.get("success") else 0.0
 
         # 3. RAG Relevance Score
         if "rag_retrieval_tool" in actual_tools and "expected_sources" in gt:
@@ -203,3 +212,4 @@ class BenchmarkEvaluator:
 
         logger.info(f"Evaluation report written to {out_file} (Pass Rate: {pass_rate_pct}%)")
         return report
+

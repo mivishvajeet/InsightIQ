@@ -50,11 +50,20 @@ class AgentIntentClassifier:
                 reasoning="Detected formal business report compilation and summary generation request.",
             )
 
+        # 0a. Out-of-Scope Domain Inquiries (route to RAG for limitation disclosure)
+        if any(kw in q_lower for kw in ["stock ticker", "nasdaq", "weather", "crypto", "bitcoin", "apple stock"]):
+            return IntentClassification(
+                intent="rag",
+                tools_required=["rag_retrieval_tool"],
+                confidence=0.90,
+                reasoning="Detected out-of-scope non-ecommerce inquiry, routing to RAG for limitation disclosure.",
+            )
+
         # 0b. Business Investigation Heuristics
         investigation_patterns = [
             r"why did (revenue|sales) (decline|drop|fall|decrease)",
             r"investigate|investigation",
-            r"(factors|reasons) (associated with|driving|behind) (declining|lower|low) (satisfaction|review|rating)",
+            r"(factors|reasons)\s+(?:are\s+)?(?:associated with|driving|behind)\s+(?:declining|lower|low)?\s*(?:customer\s+)?(?:satisfaction|review|rating)",
             r"which categories are underperforming|underperforming categories",
             r"which sellers have the highest cancellation|problematic sellers",
             r"what should the business investigate next",
@@ -85,6 +94,7 @@ class AgentIntentClassifier:
             r"^(what is|what does|how is|explain|define|tell me about)\s+(the\s+)?(definition|meaning|formula|calculation|policy|sla|schema|star schema)",
             r"(how is|how do we calculate|how to calculate)\s+",
             r"(definition of|meaning of|what does .* mean)",
+            r"difference between|what is the difference",
             r"explain the database",
             r"delivery policies|cancellation policy",
         ]

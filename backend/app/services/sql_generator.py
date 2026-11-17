@@ -61,6 +61,13 @@ CRITICAL RULES:
    - analytics.dim_products (product_id, product_category_name_english, product_category_name_pt)
    - analytics.dim_sellers (seller_id, seller_city, seller_state)
    - analytics.dim_date (date_key, full_date, year, month, year_month, day_name)
+4. GEOGRAPHIC RULES:
+   - All data in the platform is already in Brazil.
+   - States are 2-letter uppercase codes ('SP', 'RJ', 'MG', 'RS', etc.). NEVER filter by `customer_state LIKE 'BR%'` or `customer_state = 'Brazil'`.
+5. BUSINESS LOGIC RULES:
+   - For revenue, sales, and AOV: Always filter by completed orders: is_delivered = TRUE (or query views).
+   - For customer counts, retention, and repeat buyers: Always count or group by customer_unique_id (NOT customer_id).
+   - NEVER join fact_order_items directly with fact_payments on order_id.
 
 FEW-SHOT QUERY EXEMPLARS:
 - Question: "What is the monthly revenue trend?"
@@ -81,6 +88,13 @@ FEW-SHOT QUERY EXEMPLARS:
 - Question: "Are delivery delays associated with lower review scores?"
   Query: SELECT CASE WHEN delivery_delay_days <= 0 THEN 'On-Time' ELSE 'Delayed' END AS delivery_status, COUNT(*) AS orders_count, ROUND(AVG(latest_review_score), 2) AS avg_review_score, ROUND(COUNT(CASE WHEN latest_review_score = 1 THEN 1 END)::NUMERIC / COUNT(*)::NUMERIC * 100.0, 2) AS one_star_pct FROM analytics.fact_orders WHERE is_delivered = TRUE AND delivery_delay_days IS NOT NULL AND latest_review_score IS NOT NULL GROUP BY delivery_status;
 
+- Question: "What is the total gross merchandise value (GMV) excluding freight?"
+  Query: SELECT ROUND(SUM(gmv), 2) AS total_gmv FROM analytics.v_monthly_sales;
+
+- Question: "Which product categories have the longest delivery times?"
+  Query: SELECT COALESCE(dp.product_category_name_english, 'unknown') AS category, ROUND(AVG(fo.delivery_lead_time_days), 1) AS avg_delivery_days FROM analytics.fact_order_items foi JOIN analytics.fact_orders fo ON foi.order_id = fo.order_id LEFT JOIN analytics.dim_products dp ON foi.product_id = dp.product_id WHERE fo.is_delivered = TRUE AND fo.delivery_lead_time_days IS NOT NULL GROUP BY 1 ORDER BY avg_delivery_days DESC LIMIT 10;
+
+
 Return pure SQL only without commentary.
 """
 
@@ -93,6 +107,9 @@ class SQLValidator:
         """Strips markdown code blocks, comments, and extra whitespace."""
         cleaned = re.sub(r"```(?:sql)?", "", raw_sql, flags=re.IGNORECASE)
         cleaned = cleaned.replace("```", "").strip()
+        # Clean potential state filter hallucination
+        cleaned = re.sub(r"\s+WHERE\s+customer_state\s+LIKE\s+'BR%'\s*", " ", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"\s+AND\s+customer_state\s+LIKE\s+'BR%'\s*", " ", cleaned, flags=re.IGNORECASE)
         # Remove trailing semicolon
         cleaned = cleaned.rstrip(";").strip()
         return cleaned
