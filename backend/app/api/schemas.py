@@ -117,3 +117,29 @@ class AgentQueryResponse(BaseModel):
     error: Optional[str] = None
 
 
+class InvestigationRequest(BaseModel):
+    investigation_type: str = Field(..., description="Type of investigation: revenue_anomaly, satisfaction_drivers, seller_performance, transit_bottlenecks, underperforming_categories")
+    params: Optional[Dict[str, Any]] = None
+
+
+class InvestigationResponse(BaseModel):
+    success: bool
+    investigation_type: str
+    executive_summary: str
+    metrics: Dict[str, Any]
+    evidence_data: List[Dict[str, Any]]
+    causation_guardrail: str
+    recommended_action: str
+    execution_time_seconds: float
+    error: Optional[str] = None
+
+
+class ExecutiveReportResponse(BaseModel):
+    title: str
+    timestamp: str
+    metrics: Dict[str, Any]
+    markdown: str
+    sections: List[str]
+
+
+

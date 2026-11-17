@@ -16,6 +16,9 @@ from backend.app.api.schemas import (
     RAGStatusResponse,
     AgentQueryRequest,
     AgentQueryResponse,
+    InvestigationRequest,
+    InvestigationResponse,
+    ExecutiveReportResponse,
 )
 from backend.app.services.kpi_service import KPIService
 from backend.app.services.anomaly_detector import AnomalyDetector
@@ -25,6 +28,7 @@ from backend.app.services.sql_generator import SQLGenerator
 from backend.app.rag.pipeline import rag_pipeline
 from backend.app.agents.orchestrator import orchestrator_agent
 from backend.app.tools.registry import tool_registry
+from backend.app.reporting.report_generator import ReportGeneratorService
 
 router = APIRouter(prefix="/api", tags=["Analytics & AI"])
 sql_generator = SQLGenerator()
@@ -194,5 +198,32 @@ def execute_agent_query(req: AgentQueryRequest):
         return AgentQueryResponse(**result.to_dict())
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Agent orchestration failed: {e}")
+
+
+@router.post("/investigation/run", response_model=InvestigationResponse)
+def run_business_investigation(req: InvestigationRequest):
+    """
+    Executes a structured deep-dive business investigation across revenue, satisfaction, sellers, or routes.
+    """
+    try:
+        out = tool_registry.execute_tool(
+            "business_investigation_tool",
+            investigation_type=req.investigation_type,
+            params=req.params,
+        )
+        return InvestigationResponse(**out)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Investigation failed: {e}")
+
+
+@router.get("/reports/executive", response_model=ExecutiveReportResponse)
+def get_executive_report():
+    """Compiles and returns the comprehensive Executive Business Performance Report."""
+    try:
+        data = ReportGeneratorService.generate_executive_business_report()
+        return ExecutiveReportResponse(**data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Report compilation failed: {e}")
+
 
 

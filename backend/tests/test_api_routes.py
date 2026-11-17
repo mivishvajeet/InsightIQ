@@ -122,4 +122,26 @@ def test_api_agent_query():
     assert "sql_analytics_tool" in data["tools_used"]
 
 
+def test_api_investigation_run():
+    payload = {
+        "investigation_type": "satisfaction_drivers"
+    }
+    response = client.post("/api/investigation/run", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert "pearson_r" in data["metrics"]
+    assert len(data["evidence_data"]) > 0
+
+
+def test_api_reports_executive():
+    response = client.get("/api/reports/executive")
+    assert response.status_code == 200
+    data = response.json()
+    assert "InsightIQ Executive Business Performance Report" in data["markdown"]
+    assert "Total Delivered Revenue" in data["markdown"]
+    assert len(data["sections"]) >= 4
+
+
+
 
