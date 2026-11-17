@@ -44,6 +44,12 @@ class AgentResponseSynthesizer:
         """
         Synthesizes a final response using Qwen 2.5 3B based on the collected tool outputs.
         """
+        # If pure Report and markdown already compiled, return directly
+        if intent == "report" and "report_generation_tool" in tool_outputs:
+            rep_out = tool_outputs["report_generation_tool"]
+            if rep_out.get("markdown_content"):
+                return rep_out["markdown_content"]
+
         # If pure RAG and answer already exists, return with minor polishing or directly
         if intent == "rag" and "rag_retrieval_tool" in tool_outputs:
             rag_out = tool_outputs["rag_retrieval_tool"]
@@ -52,6 +58,17 @@ class AgentResponseSynthesizer:
 
         # Build context summary from tool outputs
         context_parts = []
+
+        if "business_investigation_tool" in tool_outputs:
+            inv_out = tool_outputs["business_investigation_tool"]
+            context_parts.append(
+                f"--- BUSINESS INVESTIGATION TOOL OUTPUT ---\n"
+                f"Investigation Type: {inv_out.get('investigation_type')}\n"
+                f"Executive Summary: {inv_out.get('executive_summary')}\n"
+                f"Key Metrics: {inv_out.get('metrics')}\n"
+                f"Causation Guardrail: {inv_out.get('causation_guardrail')}\n"
+                f"Recommended Action: {inv_out.get('recommended_action')}"
+            )
 
         if "sql_analytics_tool" in tool_outputs:
             sql_out = tool_outputs["sql_analytics_tool"]

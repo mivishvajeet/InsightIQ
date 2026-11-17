@@ -96,6 +96,8 @@ class OrchestratorAgent:
                 "rag": ["rag_retrieval_tool"],
                 "python": ["python_analytics_tool"],
                 "hybrid": ["rag_retrieval_tool", "sql_analytics_tool"],
+                "investigation": ["business_investigation_tool"],
+                "report": ["report_generation_tool"],
             }
             tools_plan = override_map.get(mode_override.lower(), ["sql_analytics_tool"])
             classification = IntentClassification(
@@ -174,6 +176,34 @@ class OrchestratorAgent:
                         status = "completed"
                     else:
                         desc = f"Python analytics error: {output.get('error')}"
+                        status = "failed"
+
+                elif tool_name == "business_investigation_tool":
+                    inv_type = classification.suggested_python_operation or "revenue_anomaly"
+                    output = self.tools.execute_tool("business_investigation_tool", investigation_type=inv_type)
+                    tool_outputs["business_investigation_tool"] = output
+                    tools_used.append("business_investigation_tool")
+
+                    if output.get("success"):
+                        data_table = output.get("evidence_data", [])
+                        if data_table and isinstance(data_table[0], dict):
+                            columns = list(data_table[0].keys())
+                        desc = f"Executed Business Investigation '{inv_type}': {output.get('executive_summary')[:100]}..."
+                        status = "completed"
+                    else:
+                        desc = f"Investigation error: {output.get('error')}"
+                        status = "failed"
+
+                elif tool_name == "report_generation_tool":
+                    output = self.tools.execute_tool("report_generation_tool", report_type="executive_summary")
+                    tool_outputs["report_generation_tool"] = output
+                    tools_used.append("report_generation_tool")
+
+                    if output.get("success"):
+                        desc = f"Compiled formal business report: {output.get('report_title')}"
+                        status = "completed"
+                    else:
+                        desc = f"Report generation error: {output.get('error')}"
                         status = "failed"
 
                 else:

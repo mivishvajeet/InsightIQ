@@ -41,6 +41,45 @@ class AgentIntentClassifier:
         """
         q_lower = question.lower().strip()
 
+        # 0. Formal Report Generation Heuristics
+        if any(kw in q_lower for kw in ["generate report", "performance report", "weekly summary", "business report", "executive report"]):
+            return IntentClassification(
+                intent="report",
+                tools_required=["report_generation_tool"],
+                confidence=0.96,
+                reasoning="Detected formal business report compilation and summary generation request.",
+            )
+
+        # 0b. Business Investigation Heuristics
+        investigation_patterns = [
+            r"why did (revenue|sales) (decline|drop|fall|decrease)",
+            r"investigate|investigation",
+            r"(factors|reasons) (associated with|driving|behind) (declining|lower|low) (satisfaction|review|rating)",
+            r"which categories are underperforming|underperforming categories",
+            r"which sellers have the highest cancellation|problematic sellers",
+            r"what should the business investigate next",
+            r"transit bottlenecks|route bottlenecks",
+        ]
+        if any(re.search(pat, q_lower) for pat in investigation_patterns):
+            # Determine specific investigation type
+            inv_type = "revenue_anomaly"
+            if "satisfaction" in q_lower or "review" in q_lower or "rating" in q_lower:
+                inv_type = "satisfaction_drivers"
+            elif "seller" in q_lower or "cancellation" in q_lower:
+                inv_type = "seller_performance"
+            elif "transit" in q_lower or "route" in q_lower or "corridor" in q_lower:
+                inv_type = "transit_bottlenecks"
+            elif "underperforming" in q_lower or "category" in q_lower:
+                inv_type = "underperforming_categories"
+
+            return IntentClassification(
+                intent="investigation",
+                tools_required=["business_investigation_tool"],
+                confidence=0.95,
+                reasoning=f"Detected multi-step business investigation request ('{inv_type}').",
+                suggested_python_operation=inv_type,
+            )
+
         # 1. RAG Heuristics: Definitions, formulas, schema, policy explanations
         rag_patterns = [
             r"^(what is|what does|how is|explain|define|tell me about)\s+(the\s+)?(definition|meaning|formula|calculation|policy|sla|schema|star schema)",
