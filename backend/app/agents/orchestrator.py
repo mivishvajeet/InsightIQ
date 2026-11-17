@@ -65,12 +65,18 @@ class OrchestratorAgent:
         self.classifier = classifier or AgentIntentClassifier()
         self.synthesizer = synthesizer or AgentResponseSynthesizer()
 
-    def run(self, question: str) -> AgentExecutionResult:
+    def run(
+        self,
+        question: str,
+        mode_override: Optional[str] = None,
+        top_k: int = 4,
+    ) -> AgentExecutionResult:
         """
         Executes the multi-step agent orchestration workflow for a natural language question.
+        Supports automatic intent classification or explicit mode override (sql, rag, python, hybrid).
         """
         start_overall = time.time()
-        logger.info(f"Orchestrator received question: '{question}'")
+        logger.info(f"Orchestrator received question: '{question}' (mode_override={mode_override})")
 
         steps: List[ExecutionStep] = []
         tool_outputs: Dict[str, Any] = {}
@@ -84,9 +90,24 @@ class OrchestratorAgent:
         # STEP 1: Intent Classification & Tool Planning
         # -------------------------------------------------------------
         t0 = time.time()
-        classification = self.classifier.classify(question)
-        duration_step1 = round(time.time() - t0, 3)
+        if mode_override and mode_override != "auto":
+            override_map = {
+                "sql": ["sql_analytics_tool"],
+                "rag": ["rag_retrieval_tool"],
+                "python": ["python_analytics_tool"],
+                "hybrid": ["rag_retrieval_tool", "sql_analytics_tool"],
+            }
+            tools_plan = override_map.get(mode_override.lower(), ["sql_analytics_tool"])
+            classification = IntentClassification(
+                intent=mode_override.lower(),
+                tools_required=tools_plan,
+                confidence=1.0,
+                reasoning=f"User explicitly selected '{mode_override}' execution mode.",
+            )
+        else:
+            classification = self.classifier.classify(question)
 
+        duration_step1 = round(time.time() - t0, 3)
         steps.append(
             ExecutionStep(
                 step_number=1,
