@@ -203,3 +203,38 @@ This document records the foundational architectural decisions taken based on em
   - Enforced structured citation modeling (`Citation` and `RetrievalResult`) with document names, section headers, and normalized similarity percentages.
   - Required explicit disclosure of limitations: if the query falls outside the knowledge base (e.g., stock prices, external market data), the system transparently reports: "The available InsightIQ documentation does not contain information regarding this topic."
 
+---
+
+## Phase 7: AI Agent Architecture & Tool Orchestration
+
+### Decision 17: Single Orchestrator Agent over Unnecessary Multi-Agent Complexities
+
+* **Context:**
+  Master prompt guidelines dictate: *"Use a single orchestrator agent with multiple specialised tools. Avoid unnecessary multi-agent complexity."*
+* **Decision:**
+  - Implemented a unified `OrchestratorAgent` supported by a centralized `ToolRegistry`.
+  - Avoided chaotic multi-agent debate protocols or multi-turn routing loops that introduce latency and unpredictability.
+  - Decoupled tool execution logic into modular, testable wrappers (`SQLAnalyticsTool`, `RAGRetrievalTool`, `PythonAnalyticsTool`).
+
+---
+
+### Decision 18: Deterministic Intent Taxonomy & Hybrid Multi-Tool Planning
+
+* **Context:**
+  User queries range from simple quantitative facts ("What is total revenue?") to policy questions ("What does delivered mean?") and compound analytical inquiries ("What is delivered revenue and how is it defined?").
+* **Decision:**
+  - Implemented `AgentIntentClassifier` with a four-tier taxonomy: `sql`, `rag`, `python`, and `hybrid`.
+  - Combines pattern-based semantic heuristics for sub-millisecond routing with LLM fallback.
+  - Compound questions trigger multi-tool sequential execution (retrieving RAG context first, then executing SQL data queries).
+
+---
+
+### Decision 19: Full Execution Step Transparency & Thought Tracing
+
+* **Context:**
+  Black-box AI decision making reduces stakeholder trust in business intelligence platforms.
+* **Decision:**
+  - Implemented `ExecutionStep` audit logging capturing step index, tool name, execution time, and specific operational descriptions for every agent run.
+  - Surfaced this execution trace in both the Streamlit UI and the REST API (`/api/agent/query`), providing analysts with complete transparency into the agent's reasoning path.
+
+
