@@ -105,3 +105,4 @@ The evaluation studio gives teams full transparency into agent accuracy and regr
 - Filter the 35 benchmark test logs by category or pass/fail status.
 - Analyze latency scatterplots to identify query bottlenecks.
 - Run live evaluation slices on demand with configurable question limits.
+

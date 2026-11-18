@@ -23,6 +23,15 @@ Modern enterprise analytics often suffers from a trade-off: traditional BI dashb
 
 **100% Local & Cost-Free:** All core intelligence runs on local hardware using Ollama (`qwen2.5:3b` + `nomic-embed-text`) and PostgreSQL 16—zero dependence on paid proprietary cloud APIs.
 
+👉 **[View the Complete Visual Walkthrough & AI Integration Guide](docs/DEMO_GUIDE.md)** for detailed feature tours, architectural diagrams, full-page screenshots, and video recordings.
+
+---
+
+## 🎬 Visual Walkthrough Preview
+
+![InsightIQ Animated Walkthrough](docs/assets/screenshots/insightiq_walkthrough.gif)
+*Full HD Walkthrough Video available at [`docs/assets/videos/insightiq_walkthrough.webm`](docs/assets/videos/insightiq_walkthrough.webm).*
+
 ---
 
 ## 🏛️ System Architecture

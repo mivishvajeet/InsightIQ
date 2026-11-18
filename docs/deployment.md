@@ -157,3 +157,4 @@ python -m evaluation.run_evaluation
   ```bash
   python -m backend.app.rag.indexer --rebuild
   ```
+

@@ -292,3 +292,4 @@ Triggers an automated benchmark evaluation run on demand.
 **Request Body:**
 - `category` (string, optional): Test specific category slice (e.g., `Sales Analytics`).
 - `limit` (integer, optional): Maximum questions to evaluate (default: all).
+

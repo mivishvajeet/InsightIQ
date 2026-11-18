@@ -166,3 +166,4 @@ Before query execution, `SQLValidator` parses the SQL AST:
 ### 4. Lexical Grounding & Anti-Hallucination
 - Generated answers are scored against required ground truth facts and numbers.
 - If data is absent, the agent is constrained by prompt rules to disclose the limitation rather than invent plausible approximations.
+
