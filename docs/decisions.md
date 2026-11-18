@@ -331,6 +331,38 @@ This document records the foundational architectural decisions taken based on em
   - Developed `FailureAnalyzer` (`evaluation/failure_analysis.py`) categorizing failures into tool routing flaws, SQL exemplar omissions, execution faults, grounding deficiencies, or guardrail slips.
   - Automatically generates targeted few-shot prompt recommendations and flags latency outliers (>15s) for performance optimization.
 
+---
+
+## Phase 10: Documentation, Containerization & Portfolio Release
+
+### Decision 28: Multi-Stage Production Containerization and Healthcheck Interleaving
+
+* **Context:**
+  A production-ready release requires reproducible, hermetic deployments across local workstations and cloud infrastructure with zero environment divergence.
+* **Decision:**
+  - Created multi-stage `Dockerfile` configurations for both FastAPI (`backend/Dockerfile`) and Streamlit (`frontend/Dockerfile`) utilizing non-root security principles (`appuser`).
+  - Orchestrated services in `docker-compose.yml` with strict healthcheck dependencies (`service_healthy`) ensuring that PostgreSQL and Ollama are fully initialized before backend APIs or frontend dashboards accept traffic.
+
+---
+
+### Decision 29: Automated Pre-Flight Healthcheck and Regression Verification Harness
+
+* **Context:**
+  Stakeholders or evaluators cloning the project need an unambiguous, single-command verification of data fidelity, schema migrations, LLM readiness, vector collections, and security guards.
+* **Decision:**
+  - Engineered `scripts/verify_system.py`, providing a unified terminal healthcheck CLI testing 6 operational layers: database connection pools, table row baselines, Ollama latency, ChromaDB chunk count, SQL AST safety blocking, intent classification, and benchmark scorecard health.
+
+---
+
+### Decision 30: Zero-Cloud Local-First Deployment Strategy
+
+* **Context:**
+  Proprietary cloud LLM APIs (OpenAI, Anthropic) introduce vendor lock-in, recurring API costs, latency fluctuations, and data privacy concerns when querying enterprise transactions.
+* **Decision:**
+  - Standardized on 100% open-source local execution using PostgreSQL 16 on Docker, ChromaDB for persistent on-disk embeddings, and Ollama (`qwen2.5:3b` + `nomic-embed-text`).
+  - Achieved enterprise-grade query translation, RAG retrieval, and statistical investigation without incurring cloud API expenditures.
+
+
 
 
 
