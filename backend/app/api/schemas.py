@@ -159,6 +159,23 @@ class EvaluationScorecardResponse(BaseModel):
     question_scores: List[Dict[str, Any]]
 
 
+class VoiceTranscribeRequest(BaseModel):
+    audio_base64: str = Field(..., description="Base64 encoded audio byte stream")
+    filename: Optional[str] = None
+    context_hint: Optional[str] = None
+
+
+class VoiceTranscribeResponse(BaseModel):
+    success: bool
+    text: str
+    confidence: float
+    duration_seconds: float
+    format: str
+    engine: str
+    error: Optional[str] = None
+
+
+
 
 
 

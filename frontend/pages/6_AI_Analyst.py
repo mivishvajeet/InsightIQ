@@ -17,6 +17,7 @@ if str(ROOT_DIR) not in sys.path:
 
 from backend.app.agents.orchestrator import orchestrator_agent
 from backend.app.agents.memory import get_session_memory
+from backend.app.services.speech_service import SpeechService
 from backend.app.tools.registry import tool_registry
 from frontend.components.styles import apply_theme, configure_plotly_theme
 
@@ -91,15 +92,43 @@ with tab_agent:
                 if t.rewritten_query:
                     st.caption(f"↳ Rewritten context: `{t.rewritten_query}`")
 
+    with st.expander("🎙️ Spoken Voice Query (Microphone & Audio Input)", expanded=False):
+        col_v1, col_v2 = st.columns([2, 1])
+        with col_v1:
+            recorded_audio = st.audio_input("Record your question with your microphone:", key="voice_mic_input")
+            if recorded_audio is not None:
+                audio_bytes = recorded_audio.read()
+                tr_result = SpeechService.transcribe_audio_bytes(
+                    audio_bytes,
+                    filename=getattr(recorded_audio, "name", "recording.wav"),
+                )
+                if tr_result["success"]:
+                    st.info(f"🎙️ **Transcribed Audio ({tr_result['engine']}):** *\"{tr_result['text']}\"*")
+                    st.session_state["voice_transcribed_q"] = tr_result["text"]
+                else:
+                    st.error(f"Could not transcribe audio: {tr_result.get('error')}")
+
+        with col_v2:
+            st.markdown("**Simulate Spoken Query:**")
+            samples = SpeechService.get_sample_queries()
+            sample_titles = [s["title"] for s in samples]
+            sel_sample = st.selectbox("Choose voice sample:", sample_titles, key="sample_voice_select")
+            if st.button("🎤 Load Spoken Question", key="btn_load_sample_voice"):
+                match = next((s for s in samples if s["title"] == sel_sample), None)
+                if match:
+                    st.session_state["voice_transcribed_q"] = match["transcript"]
+                    st.rerun()
+
     col_select, col_mode = st.columns([3, 1])
     with col_select:
         selected_agent_q = st.selectbox("💡 Suggested Business Questions:", ["-- Custom Question --"] + AGENT_EXAMPLES, key="agent_select")
     with col_mode:
         mode_override = st.selectbox("Execution Mode:", ["auto", "sql", "rag", "python", "hybrid"], index=0)
 
+    default_val = st.session_state.get("voice_transcribed_q") or ("" if selected_agent_q.startswith("--") else selected_agent_q)
     user_agent_query = st.text_input(
         "Enter your question for the AI Agent (follow-up questions automatically supported):",
-        value="" if selected_agent_q.startswith("--") else selected_agent_q,
+        value=default_val,
         key="agent_input",
     )
 

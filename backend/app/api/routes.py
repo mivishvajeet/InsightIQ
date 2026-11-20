@@ -4,6 +4,7 @@ FastAPI Routes for InsightIQ Analytics & AI Agent endpoints.
 
 import time
 import json
+import base64
 from pathlib import Path
 from typing import Dict, Any, List
 from starlette.responses import StreamingResponse, Response
@@ -24,12 +25,15 @@ from backend.app.api.schemas import (
     ExecutiveReportResponse,
     EvaluationRunRequest,
     EvaluationScorecardResponse,
+    VoiceTranscribeRequest,
+    VoiceTranscribeResponse,
 )
 from backend.app.services.kpi_service import KPIService
 from backend.app.services.anomaly_detector import AnomalyDetector
 from backend.app.services.correlation_analyzer import CorrelationAnalyzer
 from backend.app.services.customer_analytics import CustomerAnalyticsService
 from backend.app.services.sql_generator import SQLGenerator
+from backend.app.services.speech_service import SpeechService
 from backend.app.rag.pipeline import rag_pipeline
 from backend.app.agents.orchestrator import orchestrator_agent
 from backend.app.tools.registry import tool_registry
@@ -314,6 +318,27 @@ def run_evaluation_benchmark(req: EvaluationRunRequest):
         return EvaluationScorecardResponse(**report)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Evaluation execution failed: {e}")
+
+
+@router.get("/voice/samples")
+def get_voice_sample_queries():
+    """Returns curated speech queries for quick voice simulation and testing."""
+    return SpeechService.get_sample_queries()
+
+
+@router.post("/voice/transcribe", response_model=VoiceTranscribeResponse)
+def transcribe_voice_audio(req: VoiceTranscribeRequest):
+    """Transcribes base64-encoded audio byte stream into text query."""
+    try:
+        audio_bytes = base64.b64decode(req.audio_base64)
+        result = SpeechService.transcribe_audio_bytes(
+            audio_bytes=audio_bytes,
+            filename=req.filename,
+            context_hint=req.context_hint,
+        )
+        return VoiceTranscribeResponse(**result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Voice transcription failed: {e}")
 
 
 
