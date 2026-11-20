@@ -13,6 +13,7 @@ from dataclasses import dataclass, asdict
 
 from backend.app.agents.intent_classifier import AgentIntentClassifier, IntentClassification
 from backend.app.agents.synthesizer import AgentResponseSynthesizer
+from backend.app.agents.memory import get_session_memory, ConversationalMemoryManager
 from backend.app.tools.registry import ToolRegistry, tool_registry
 
 logger = logging.getLogger(__name__)
@@ -70,14 +71,17 @@ class OrchestratorAgent:
         question: str,
         mode_override: Optional[str] = None,
         top_k: int = 4,
+        session_id: str = "default_session",
     ) -> AgentExecutionResult:
         """
         Executes the multi-step agent orchestration workflow for a natural language question.
-        Supports automatic intent classification or explicit mode override (sql, rag, python, hybrid).
+        Supports automatic intent classification or explicit mode override (sql, rag, python, hybrid),
+        and maintains conversational context memory across session turns.
         """
         start_overall = time.time()
-        logger.info(f"Orchestrator received question: '{question}' (mode_override={mode_override})")
+        logger.info(f"Orchestrator received question: '{question}' (mode_override={mode_override}, session={session_id})")
 
+        memory = get_session_memory(session_id)
         steps: List[ExecutionStep] = []
         tool_outputs: Dict[str, Any] = {}
         tools_used: List[str] = []
@@ -106,13 +110,27 @@ class OrchestratorAgent:
                 confidence=1.0,
                 reasoning=f"User explicitly selected '{mode_override}' execution mode.",
             )
+            effective_question = question
         else:
-            classification = self.classifier.classify(question)
+            classification = self.classifier.classify(question, memory=memory)
+            effective_question = classification.rewritten_query or question
 
         duration_step1 = round(time.time() - t0, 3)
+        if classification.rewritten_query:
+            steps.append(
+                ExecutionStep(
+                    step_number=1,
+                    step_name="Conversational Query Rewriting",
+                    tool_name=None,
+                    description=f"Resolved follow-up question to: '{effective_question}'",
+                    status="completed",
+                    duration_seconds=duration_step1,
+                )
+            )
+
         steps.append(
             ExecutionStep(
-                step_number=1,
+                step_number=len(steps) + 1,
                 step_name="Intent Planning",
                 tool_name=None,
                 description=f"Classified intent as '{classification.intent}'. Planning tools: {classification.tools_required}. ({classification.reasoning})",
@@ -130,7 +148,7 @@ class OrchestratorAgent:
 
             try:
                 if tool_name == "sql_analytics_tool":
-                    output = self.tools.execute_tool("sql_analytics_tool", question=question)
+                    output = self.tools.execute_tool("sql_analytics_tool", question=effective_question)
                     tool_outputs["sql_analytics_tool"] = output
                     tools_used.append("sql_analytics_tool")
 
@@ -147,8 +165,8 @@ class OrchestratorAgent:
                 elif tool_name == "rag_retrieval_tool":
                     output = self.tools.execute_tool(
                         "rag_retrieval_tool",
-                        query=question,
-                        top_k=4,
+                        query=effective_question,
+                        top_k=top_k,
                         synthesize_answer=True,
                     )
                     tool_outputs["rag_retrieval_tool"] = output
@@ -231,7 +249,7 @@ class OrchestratorAgent:
         # -------------------------------------------------------------
         t_synth = time.time()
         final_answer = self.synthesizer.synthesize(
-            question=question,
+            question=effective_question,
             tool_outputs=tool_outputs,
             intent=classification.intent,
         )
@@ -249,6 +267,16 @@ class OrchestratorAgent:
         )
 
         total_elapsed = round(time.time() - start_overall, 3)
+
+        # Record completed interaction in session memory
+        memory.add_turn(
+            user_query=question,
+            final_answer=final_answer,
+            intent=classification.intent,
+            tools_used=tools_used,
+            sql_query=sql_query,
+            rewritten_query=classification.rewritten_query,
+        )
 
         return AgentExecutionResult(
             question=question,

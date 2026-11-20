@@ -16,6 +16,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from backend.app.agents.orchestrator import orchestrator_agent
+from backend.app.agents.memory import get_session_memory
 from backend.app.tools.registry import tool_registry
 from frontend.components.styles import apply_theme, configure_plotly_theme
 
@@ -61,6 +62,26 @@ with tab_agent:
         "What customer segments generate the most revenue?",
     ]
 
+    # Conversational Multi-Turn Context Display & Clear Control
+    session_id = "streamlit_session"
+    memory = get_session_memory(session_id)
+    recent_turns = memory.get_recent_turns(limit=5)
+
+    if recent_turns:
+        with st.expander(f"💬 Active Conversational Memory ({len(recent_turns)} turns tracked)", expanded=False):
+            col_mem_info, col_mem_clear = st.columns([4, 1])
+            with col_mem_info:
+                st.caption("The agent remembers entities and prior queries to resolve follow-ups (e.g., 'Filter that down to São Paulo').")
+            with col_mem_clear:
+                if st.button("🧹 Clear Memory", key="btn_clear_mem"):
+                    memory.clear()
+                    st.rerun()
+
+            for t in recent_turns:
+                st.markdown(f"**Turn {t.turn_id}:** *\"{t.user_query}\"*")
+                if t.rewritten_query:
+                    st.caption(f"↳ Rewritten context: `{t.rewritten_query}`")
+
     col_select, col_mode = st.columns([3, 1])
     with col_select:
         selected_agent_q = st.selectbox("💡 Suggested Business Questions:", ["-- Custom Question --"] + AGENT_EXAMPLES, key="agent_select")
@@ -68,7 +89,7 @@ with tab_agent:
         mode_override = st.selectbox("Execution Mode:", ["auto", "sql", "rag", "python", "hybrid"], index=0)
 
     user_agent_query = st.text_input(
-        "Enter your question for the AI Agent:",
+        "Enter your question for the AI Agent (follow-up questions automatically supported):",
         value="" if selected_agent_q.startswith("--") else selected_agent_q,
         key="agent_input",
     )
@@ -77,13 +98,15 @@ with tab_agent:
         if not user_agent_query:
             st.warning("Please enter or select a business question.")
         else:
-            with st.spinner("Agent analyzing intent, dispatching tools, and synthesizing evidence..."):
+            with st.spinner("Agent analyzing intent, resolving context, and synthesizing evidence..."):
                 start_t = time.time()
                 result = orchestrator_agent.run(
                     question=user_agent_query,
                     mode_override=None if mode_override == "auto" else mode_override,
+                    session_id=session_id,
                 )
                 elapsed = round(time.time() - start_t, 2)
+
 
             st.success(f"✅ Workflow Completed in {elapsed}s | Intent: **{result.intent.upper()}** | Tools Used: **{', '.join(result.tools_used)}**")
 
