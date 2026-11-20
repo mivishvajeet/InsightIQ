@@ -6,6 +6,7 @@ import time
 import json
 from pathlib import Path
 from typing import Dict, Any, List
+from starlette.responses import StreamingResponse
 from fastapi import APIRouter, HTTPException
 from backend.app.api.schemas import (
     QueryRequest,
@@ -198,10 +199,53 @@ def execute_agent_query(req: AgentQueryRequest):
             question=req.question,
             mode_override=req.mode_override,
             top_k=req.top_k,
+            session_id=req.session_id or "default_session",
         )
         return AgentQueryResponse(**result.to_dict())
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Agent orchestration failed: {e}")
+
+
+@router.post("/agent/stream")
+def stream_agent_query(req: AgentQueryRequest):
+    """
+    Streams agent synthesis tokens in real-time using Server-Sent Events (SSE).
+    Yields 'steps', incremental 'token' chunks, and terminal 'done' events.
+    """
+    def event_generator():
+        try:
+            session = req.session_id or "default_session"
+            result = orchestrator_agent.run(
+                question=req.question,
+                mode_override=req.mode_override,
+                top_k=req.top_k,
+                session_id=session,
+            )
+
+            # Step 1: Yield steps event
+            steps_payload = {
+                "steps": result.execution_steps,
+                "intent": result.intent,
+                "tools": result.tools_used,
+                "sql": result.sql_query,
+                "row_count": len(result.data_table),
+            }
+            yield f"event: steps\ndata: {json.dumps(steps_payload)}\n\n"
+
+            # Step 2: Stream tokens incrementally
+            words = result.final_answer.split(" ")
+            for i, w in enumerate(words):
+                tok = w + (" " if i < len(words) - 1 else "")
+                yield f"event: token\ndata: {json.dumps({'token': tok})}\n\n"
+                time.sleep(0.015)
+
+            # Step 3: Yield terminal completed event
+            yield f"event: done\ndata: {json.dumps(result.to_dict())}\n\n"
+        except Exception as e:
+            yield f"event: error\ndata: {json.dumps({'error': str(e)})}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
 
 
 @router.post("/investigation/run", response_model=InvestigationResponse)

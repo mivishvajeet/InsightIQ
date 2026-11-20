@@ -100,6 +100,8 @@ class AgentQueryRequest(BaseModel):
     question: str = Field(..., description="Natural language business question", json_schema_extra={"example": "What is the monthly revenue trend and how is delivered revenue defined?"})
     mode_override: Optional[str] = Field(None, description="Optional tool override: 'sql', 'rag', 'python', 'hybrid', or 'auto'")
     top_k: int = Field(4, ge=1, le=10)
+    session_id: Optional[str] = Field("default_session", description="Optional conversation session ID for multi-turn memory")
+
 
 
 class AgentQueryResponse(BaseModel):
