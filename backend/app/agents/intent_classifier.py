@@ -23,6 +23,7 @@ class IntentClassification:
     confidence: float
     reasoning: str
     suggested_python_operation: Optional[str] = None
+    rewritten_query: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -34,12 +35,64 @@ class AgentIntentClassifier:
     def __init__(self, llm_client: Optional[OllamaClient] = None):
         self.llm = llm_client or OllamaClient()
 
-    def classify(self, question: str) -> IntentClassification:
+    def resolve_conversational_query(
+        self,
+        question: str,
+        memory: Optional[Any] = None,
+    ) -> Tuple[str, Optional[str]]:
+        """
+        Detects anaphora / coreferences in multi-turn dialogues and rewrites the query
+        to be fully self-contained based on preceding conversation context.
+        Returns: (effective_question, rewrite_explanation)
+        """
+        if not memory or not hasattr(memory, "get_last_turn"):
+            return question, None
+
+        last_turn = memory.get_last_turn()
+        if not last_turn:
+            return question, None
+
+        q_clean = question.strip()
+        q_lower = q_clean.lower()
+
+        # Follow-up patterns that depend on previous turn
+        follow_up_patterns = [
+            (r"^(?:filter\s+(?:that|this|it)\s+(?:down\s+)?to|only\s+for|just\s+for|restricted\s+to)\s+(.+)", "filtered to {match}"),
+            (r"^(?:what\s+about|how\s+about|and\s+for|what\s+of)\s+(.+)", "for {match}"),
+            (r"^(?:break\s+(?:that|this|it)\s+down\s+by|grouped\s+by)\s+(.+)", "broken down by {match}"),
+            (r"^(?:now\s+show|now\s+give\s+me)\s+(?:only\s+)?(.+)", "for {match}"),
+        ]
+
+        prev_q = last_turn.user_query.rstrip("?. ")
+
+        for pattern, template in follow_up_patterns:
+            match = re.match(pattern, q_lower)
+            if match:
+                matched_arg = match.group(1).strip() if match.lastindex and match.lastindex >= 1 else ""
+                clause = template.format(match=matched_arg) if "{match}" in template else template
+                rewritten = f"{prev_q} ({clause})"
+                explanation = f"Resolved conversational reference '{q_clean}' against prior turn query: '{prev_q}'"
+                logger.info(f"Conversational Memory Rewrite: '{q_clean}' -> '{rewritten}'")
+                return rewritten, explanation
+
+        return question, None
+
+    def classify(self, question: str, memory: Optional[Any] = None) -> IntentClassification:
         """
         Determines the intent and tool requirements for a given question.
-        Combines pattern-based semantic heuristics with LLM fallback.
+        Combines pattern-based semantic heuristics, conversational resolution, with LLM fallback.
         """
+        effective_query, rewrite_note = self.resolve_conversational_query(question, memory)
+        classification = self._classify_raw(effective_query)
+        if rewrite_note:
+            classification.rewritten_query = effective_query
+            classification.reasoning = f"{classification.reasoning} ({rewrite_note})"
+        return classification
+
+    def _classify_raw(self, question: str) -> IntentClassification:
+        """Internal classification engine operating on resolved question text."""
         q_lower = question.lower().strip()
+
 
         # 0. Formal Report Generation Heuristics
         if any(kw in q_lower for kw in ["generate report", "performance report", "weekly summary", "business report", "executive report"]):
