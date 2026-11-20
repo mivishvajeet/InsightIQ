@@ -9,7 +9,7 @@ Includes health checks, structured JSON response mode, and timeout protection.
 import os
 import json
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Generator
 import requests
 from dotenv import load_dotenv
 
@@ -90,6 +90,45 @@ class OllamaClient:
             logger.error(f"Ollama generation request failed: {e}")
             raise RuntimeError(f"Ollama generation error: {e}") from e
 
+    def generate_stream(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        model: Optional[str] = None,
+        temperature: float = 0.1,
+    ) -> Generator[str, None, None]:
+        """
+        Streams generated text tokens incrementally from Ollama.
+        Yields chunk tokens as they are produced by the local LLM.
+        """
+        selected_model = model or self.default_model
+        payload = {
+            "model": selected_model,
+            "prompt": prompt,
+            "stream": True,
+            "options": {
+                "temperature": temperature,
+                "top_p": 0.9,
+            },
+        }
+        if system_prompt:
+            payload["system"] = system_prompt
+
+        try:
+            with requests.post(f"{self.base_url}/api/generate", json=payload, stream=True, timeout=self.timeout) as resp:
+                resp.raise_for_status()
+                for line in resp.iter_lines():
+                    if line:
+                        chunk = json.loads(line.decode("utf-8"))
+                        token = chunk.get("response", "")
+                        if token:
+                            yield token
+                        if chunk.get("done", False):
+                            break
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Ollama streaming request failed: {e}")
+            raise RuntimeError(f"Ollama streaming error: {e}") from e
+
     def chat(
         self,
         messages: List[Dict[str, str]],
@@ -120,4 +159,39 @@ class OllamaClient:
         except requests.exceptions.RequestException as e:
             logger.error(f"Ollama chat request failed: {e}")
             raise RuntimeError(f"Ollama chat error: {e}") from e
+
+    def chat_stream(
+        self,
+        messages: List[Dict[str, str]],
+        model: Optional[str] = None,
+        temperature: float = 0.1,
+    ) -> Generator[str, None, None]:
+        """
+        Streams chat completion tokens incrementally from Ollama.
+        """
+        selected_model = model or self.default_model
+        payload = {
+            "model": selected_model,
+            "messages": messages,
+            "stream": True,
+            "options": {
+                "temperature": temperature,
+            },
+        }
+
+        try:
+            with requests.post(f"{self.base_url}/api/chat", json=payload, stream=True, timeout=self.timeout) as resp:
+                resp.raise_for_status()
+                for line in resp.iter_lines():
+                    if line:
+                        chunk = json.loads(line.decode("utf-8"))
+                        token = chunk.get("message", {}).get("content", "")
+                        if token:
+                            yield token
+                        if chunk.get("done", False):
+                            break
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Ollama chat streaming request failed: {e}")
+            raise RuntimeError(f"Ollama chat streaming error: {e}") from e
+
 
