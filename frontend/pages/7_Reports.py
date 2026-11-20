@@ -17,6 +17,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from backend.app.reporting.report_generator import ReportGeneratorService
+from backend.app.reporting.pdf_generator import PDFReportGenerator
 from frontend.components.styles import apply_theme
 
 st.set_page_config(page_title="Executive Reports | InsightIQ", page_icon="📑", layout="wide")
@@ -42,8 +43,8 @@ with st.spinner("Compiling live metrics, analytical correlations, and executive 
 
 st.success(f"Report compiled successfully at **{report_data['timestamp']}**")
 
-# Export Buttons
-col_dl1, col_dl2, col_dl3 = st.columns([1, 1, 3])
+# Export Buttons (Markdown, PDF, JSON)
+col_dl1, col_dl2, col_dl3, col_dl4 = st.columns([1, 1, 1, 2])
 with col_dl1:
     st.download_button(
         label="📥 Download Markdown",
@@ -53,8 +54,17 @@ with col_dl1:
     )
 
 with col_dl2:
+    pdf_bytes = PDFReportGenerator.generate_pdf_bytes(report_data)
     st.download_button(
-        label="📥 Export JSON Metrics",
+        label="📑 Download PDF Briefing",
+        data=pdf_bytes,
+        file_name=f"insightiq_executive_briefing_{report_data['timestamp'].replace(':', '-').replace(' ', '_')}.pdf",
+        mime="application/pdf",
+    )
+
+with col_dl3:
+    st.download_button(
+        label="📊 Export JSON Metrics",
         data=json.dumps(report_data["metrics"], indent=2, default=str),
         file_name=f"insightiq_metrics_{report_data['timestamp'].replace(':', '-').replace(' ', '_')}.json",
         mime="application/json",

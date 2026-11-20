@@ -6,7 +6,7 @@ import time
 import json
 from pathlib import Path
 from typing import Dict, Any, List
-from starlette.responses import StreamingResponse
+from starlette.responses import StreamingResponse, Response
 from fastapi import APIRouter, HTTPException
 from backend.app.api.schemas import (
     QueryRequest,
@@ -34,6 +34,7 @@ from backend.app.rag.pipeline import rag_pipeline
 from backend.app.agents.orchestrator import orchestrator_agent
 from backend.app.tools.registry import tool_registry
 from backend.app.reporting.report_generator import ReportGeneratorService
+from backend.app.reporting.pdf_generator import PDFReportGenerator
 
 router = APIRouter(prefix="/api", tags=["Analytics & AI"])
 sql_generator = SQLGenerator()
@@ -272,6 +273,20 @@ def get_executive_report():
         return ExecutiveReportResponse(**data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Report compilation failed: {e}")
+
+
+@router.get("/reports/executive/pdf")
+def get_executive_report_pdf():
+    """Compiles and downloads the boardroom-ready Executive PDF Briefing."""
+    try:
+        pdf_bytes = PDFReportGenerator.generate_pdf_bytes()
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": 'attachment; filename="insightiq_executive_briefing.pdf"'},
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"PDF generation failed: {e}")
 
 
 @router.get("/evaluation/summary", response_model=EvaluationScorecardResponse)
