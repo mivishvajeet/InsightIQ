@@ -20,6 +20,15 @@ from backend.app.agents.memory import get_session_memory
 from backend.app.tools.registry import tool_registry
 from frontend.components.styles import apply_theme, configure_plotly_theme
 
+
+def stream_text_tokens(text: str):
+    """Yields incremental tokens with micro-delays for a realistic typewriter effect."""
+    words = text.split(" ")
+    for i, w in enumerate(words):
+        yield w + (" " if i < len(words) - 1 else "")
+        time.sleep(0.012)
+
+
 st.set_page_config(page_title="AI Analyst | InsightIQ", page_icon="🤖", layout="wide")
 apply_theme()
 
@@ -120,9 +129,9 @@ with tab_agent:
                     f"({step['duration_seconds']}s) — *{step['description']}*"
                 )
 
-            # Executive Answer
+            # Executive Answer with real-time typewriter token stream
             st.markdown("<div class='section-header'>Executive Business Answer</div>", unsafe_allow_html=True)
-            st.markdown(result.final_answer)
+            st.write_stream(stream_text_tokens(result.final_answer))
 
             # Structured Data & Visual Evidence (if SQL or Python data present)
             if result.data_table:
