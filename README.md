@@ -9,7 +9,7 @@
 [![Ollama Qwen 2.5 3B](https://img.shields.io/badge/Ollama-Qwen_2.5_3B-black.svg)](https://ollama.com/)
 [![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-orange.svg)](https://www.trychroma.com/)
 [![LangChain](https://img.shields.io/badge/LangChain-RAG_Framework-1C3C3C.svg)](https://www.langchain.com/)
-[![Tests Passing](https://img.shields.io/badge/pytest-104%2F104_passed-brightgreen.svg)]()
+[![Tests Passing](https://img.shields.io/badge/pytest-118%2F118_passed-brightgreen.svg)]()
 [![Benchmark Pass Rate](https://img.shields.io/badge/benchmark-91.4%25_pass_rate-success.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -90,6 +90,25 @@ Grounded across **99,441 orders** and **1,550,922 ingested records** from the Br
 
 ---
 
+## ⚡ v1.1 Advanced Agentic Capabilities
+
+InsightIQ v1.1 expands the autonomous analyst with cutting-edge conversational ergonomics:
+
+1. **🧠 Conversational Multi-Turn Memory (`ConversationalMemoryManager`):**
+   - Retains sliding-window dialogue turns with session isolation.
+   - Coreference resolution rewrites follow-up questions (e.g. *"Filter that down to São Paulo"*, *"What about health and beauty?"*) using preceding turn SQL context and entity parameters.
+2. **🌊 Real-Time Token Streaming (Server-Sent Events & Typewriter UI):**
+   - Exposes `POST /api/agent/stream` yielding immediate tool step traces and incremental word tokens.
+   - Live `st.write_stream` typewriter rendering delivers snappy visual feedback as the agent formulates conclusions.
+3. **📑 Boardroom Executive PDF Briefing Engine (`PDFReportGenerator`):**
+   - High-fidelity PDF document generation using pure-Python ReportLab with corporate styling (Slate-900 / Teal-600 palette).
+   - Generates executive KPI grids, satisfaction cohorts, anomaly audits, and strategic recommendation tables, downloadable from Streamlit or `GET /api/reports/executive/pdf`.
+4. **🎙️ Local-First Audio Speech-to-Text Input (`SpeechService`):**
+   - Integrated browser microphone input (`st.audio_input`) allowing direct voice inquiries.
+   - Local audio container inspection (WAV, WebM, Ogg, MP3) with Whisper and acoustic energy recognition fallback, plus one-click enterprise speech simulation.
+
+---
+
 ## 🛡️ Enterprise Security & Safety Guardrails
 
 1. **Role-Based Least Privilege:** AI agent queries execute strictly under the `insightiq_readonly` database role with `GRANT SELECT` on `analytics.*` only. Destructive actions fail at the database level.
@@ -146,8 +165,8 @@ Average Response Latency:     10.62s
 | **`3_Customer_Analytics.py`** | RFM segment distribution (Champions, Loyalists, Hibernating), repeat purchase rates. |
 | **`4_Operations_Logistics.py`** | Lead time distributions, on-time percentage, shipping carrier bottlenecks, seller audit. |
 | **`5_Business_Investigation.py`** | Root-cause variance decomposition ($\Delta\text{Volume} \times \Delta\text{Price}$), 3-day delay cliff analysis. |
-| **`6_AI_Analyst.py`** | Multi-tool conversational interface with execution step traces, SQL viewer, and CSV table download. |
-| **`7_Reports.py`** | Compilation and one-click export of formal Executive Business Briefings (Markdown and JSON). |
+| **`6_AI_Analyst.py`** | Multi-tool conversational interface with live typewriter token streaming, multi-turn conversational memory, microphone voice input, execution step traces, SQL viewer, and CSV table download. |
+| **`7_Reports.py`** | Compilation and one-click export of formal Executive Business Briefings in Markdown (`.md`), Boardroom PDF (`.pdf`), and JSON (`.json`). |
 | **`8_Evaluation_Framework.py`** | Live regression test runner, category pass rate bar charts, latency plots, and question inspector. |
 
 ---
@@ -212,14 +231,14 @@ streamlit run frontend/app.py
 InsightHQ/
 ├── backend/
 │   ├── app/
-│   │   ├── agents/          # Orchestrator, Intent Classifier, Response Synthesizer
+│   │   ├── agents/          # Orchestrator, Intent Classifier, Conversational Memory
 │   │   ├── api/             # FastAPI routers, endpoints, and Pydantic schemas
 │   │   ├── investigation/   # Revenue variance, delay cliff, and bottleneck investigators
 │   │   ├── rag/             # LangChain ChromaDB loaders, splitters, retriever, pipeline
-│   │   ├── reporting/       # Executive report compilation service
-│   │   ├── services/        # Database pool, KPI engine, anomaly detector, SQL generator
+│   │   ├── reporting/       # Executive Markdown & PDF report compilation services
+│   │   ├── services/        # Database pool, KPI engine, anomaly detector, SQL generator, Speech service
 │   │   └── tools/           # Tool registry, SQL tool, RAG tool, Python tool
-│   ├── tests/               # 104 comprehensive pytest unit & integration tests
+│   ├── tests/               # 118 comprehensive pytest unit & integration tests
 │   └── Dockerfile           # Multi-stage production backend container image
 ├── frontend/
 │   ├── components/          # Reusable UI styles and metrics cards
@@ -235,7 +254,7 @@ InsightHQ/
 │   ├── deployment.md        # Production deployment guide and operational runbook
 │   ├── user_guide.md        # End-user analytics playbook and prompt guide
 │   ├── evaluation.md        # Benchmark evaluation methodology and scoring algorithms
-│   └── decisions.md         # 27 Architecture Decision Records (ADRs) across all phases
+│   └── decisions.md         # 34 Architecture Decision Records (ADRs) across all phases
 ├── evaluation/
 │   ├── benchmark_questions.json  # 35 standardized test questions with ground truth
 │   ├── evaluator.py              # Automated test harness & scorecard aggregator

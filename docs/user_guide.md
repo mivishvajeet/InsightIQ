@@ -65,7 +65,29 @@ By default, the agent runs in `Auto-Detect` mode, dynamically selecting the best
 
 ---
 
-## 3. Business Investigation Studio (`5_Business_Investigation.py`)
+## 3. v1.1 Advanced Agentic Capabilities
+
+### 1. Conversational Multi-Turn Memory & Follow-Up Questions
+The AI Analyst retains sliding-window memory across conversation turns within each session. You can ask natural follow-up questions without repeating preceding context:
+1. **Turn 1:** *"What was total revenue in 2017?"*
+2. **Turn 2:** *"Filter that down to São Paulo customer orders."*
+3. **Turn 3:** *"What about health and beauty products?"*
+
+The agent's `ConversationalMemoryManager` and intent classifier automatically detect coreference triggers (`"filter that down"`, `"break that down"`, `"what about"`, `"it"`, `"that"`), inspect preceding turn SQL and entities, and rewrite the follow-up question into an unambiguous query before dispatching.
+
+### 2. Real-Time Token Streaming (Typewriter Effect)
+Executive answers stream live into the Streamlit studio using token-level generators with micro-delays (`st.write_stream`). Token streams provide immediate visual feedback, reducing perceived latency while the agent articulates deep analytical insights.
+
+### 3. Voice Query Input (Local Speech-to-Text)
+You can speak directly to the AI Analyst:
+- Click the **🎙️ Spoken Voice Query** expander.
+- Record your question using your workstation microphone via `st.audio_input`.
+- The local `SpeechService` inspects the audio stream (WAV, WebM, Ogg, MP3) and transcribes your voice query.
+- Alternatively, select from pre-configured enterprise spoken questions to simulate voice interaction with one click.
+
+---
+
+## 4. Business Investigation Studio (`5_Business_Investigation.py`)
 
 The Investigation Studio provides automated analytical workflows that mathematically dissect anomalies rather than relying on superficial summaries:
 
@@ -94,7 +116,7 @@ Stakeholders can compile and export end-to-end business briefings:
 1. Navigate to **`7_Reports`**.
 2. Select report template (Executive Performance Report, Operational Health, or Seller Audit).
 3. Click **"Generate Report"** to run live aggregations across sales, satisfaction, anomalies, and strategic actions.
-4. Export as **Markdown (`.md`)** for executive documentation or **JSON (`.json`)** for automated BI ingestion.
+4. Export as **Markdown (`.md`)** for executive documentation, **PDF Briefing (`.pdf`)** styled with corporate KPI grids and anomaly audits for boardroom presentations, or **JSON (`.json`)** for automated BI ingestion.
 
 ---
 

@@ -362,6 +362,56 @@ This document records the foundational architectural decisions taken based on em
   - Standardized on 100% open-source local execution using PostgreSQL 16 on Docker, ChromaDB for persistent on-disk embeddings, and Ollama (`qwen2.5:3b` + `nomic-embed-text`).
   - Achieved enterprise-grade query translation, RAG retrieval, and statistical investigation without incurring cloud API expenditures.
 
+---
+
+## Phase 11: v1.1 Feature Extensions (Memory, Streaming, PDF Briefings, Voice)
+
+### Decision 31: Sliding Window Conversational Memory & Coreference Query Rewriting
+
+* **Context:**
+  Business users frequently ask multi-turn follow-up questions (e.g. asking "What is total revenue?", then following up with "Filter that down to São Paulo" or "What about health and beauty?"). Standard stateless agents treat each query in isolation and fail on elliptical queries lacking an explicit subject.
+* **Decision:**
+  - Built `ConversationalMemoryManager` maintaining in-memory sliding window history of recent turns (queries, answers, executed SQL, and tool outputs).
+  - Implemented `AgentIntentClassifier.resolve_conversational_query()`: scans for coreference triggers (`"filter that down"`, `"break that down"`, `"what about"`, `"how about"`, pronouns `"it"`, `"that"`) and rewrites follow-up questions with full entity context from preceding turns and SQL syntax.
+  - Exposes thread isolation via `session_id` across FastAPI endpoints and Streamlit session states.
+
+---
+
+### Decision 32: Server-Sent Events (SSE) for Real-Time Token-by-Token Streaming
+
+* **Context:**
+  Local 3B parameter LLMs generating analytical syntheses take 2 to 4 seconds to produce complete multi-sentence responses. Requiring users to stare at static loading spinners harms perceived responsiveness.
+* **Decision:**
+  - Engineered token-level streaming in `OllamaClient` via `generate_stream()` and `chat_stream()`.
+  - Implemented FastAPI endpoint `POST /api/agent/stream` using Starlette `StreamingResponse` emitting typed Server-Sent Events:
+    - `event: steps`: Emits execution plan and intermediate tool steps immediately.
+    - `event: token`: Emits incremental tokens with micro-delays for typewriter rendering.
+    - `event: done`: Emits final consolidated payload.
+  - Integrated `st.write_stream` in Streamlit Agent Studio for live typewriter rendering.
+
+---
+
+### Decision 33: Pure-Python Executive PDF Briefing Generation via ReportLab
+
+* **Context:**
+  C-suite executives and board members require downloadable, presentation-ready briefing summaries rather than interactive dashboards or raw Markdown text. Heavy headless-browser PDF engines (Playwright, Puppeteer, WeasyPrint) introduce complex system dependencies and native binary bloat.
+* **Decision:**
+  - Built `PDFReportGenerator` using pure-Python `reportlab` with zero headless browser overhead.
+  - Implemented customized corporate styling (Slate-900 / Teal-600 palette), multi-column KPI grids, customer satisfaction cohorts, anomaly audit callouts, and strategic action tables.
+  - Exposes in-memory byte generation via `generate_pdf_bytes()` directly accessible from Streamlit download buttons and FastAPI `GET /api/reports/executive/pdf`.
+
+---
+
+### Decision 34: Local-First Audio Inspection and Multi-Modal Speech-to-Text Pipeline
+
+* **Context:**
+  Executives and mobile stakeholders often prefer speaking questions into the analytics dashboard rather than typing complex SQL/BI prompts. External cloud speech APIs (Whisper API, Google Speech) violate the local-first, zero-cloud commitment.
+* **Decision:**
+  - Implemented `SpeechService` capable of parsing browser audio streams (WAV, WebM, Ogg, MP3) and calculating acoustic energy and duration.
+  - Built dynamic local Whisper support (`faster-whisper` / `whisper` on local CPU) with graceful acoustic-heuristic fallback for zero-dependency execution.
+  - Integrated native `st.audio_input` in Streamlit for browser-based microphone recording, paired with pre-configured enterprise audio question samples for instant demonstration.
+
+
 
 
 

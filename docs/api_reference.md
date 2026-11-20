@@ -32,12 +32,13 @@ curl -X GET http://localhost:8000/api/health
 ## 2. Multi-Tool Agent Orchestration
 
 ### `POST /api/agent/query`
-The primary conversational intelligence endpoint. Dispatches business queries through the single orchestrator agent, executing tools (SQL, RAG, Python, Investigation, Reporting) and returning step-by-step traces with anti-hallucination grounded responses.
+The primary conversational intelligence endpoint. Dispatches business queries through the single orchestrator agent, executing tools (SQL, RAG, Python, Investigation, Reporting) and returning step-by-step traces with anti-hallucination grounded responses. Supports multi-turn conversational memory via `session_id`.
 
 **Request Body:**
-- `question` (string, required): The natural language business inquiry.
+- `question` (string, required): The natural language business inquiry or follow-up question.
 - `mode_override` (string, optional): Forced tool mode (`auto`, `sql`, `rag`, `python`, `hybrid`). Default is `auto`.
 - `top_k` (integer, optional): Number of context chunks for RAG operations (default: 4).
+- `session_id` (string, optional): Session identifier to maintain sliding conversational context and coreference resolution across turns (default: `"default_session"`).
 
 **Example Request:**
 ```bash
@@ -46,8 +47,30 @@ curl -X POST http://localhost:8000/api/agent/query \
   -d '{
     "question": "What is the monthly revenue trend and how is delivered revenue defined?",
     "mode_override": "auto",
-    "top_k": 4
+    "top_k": 4,
+    "session_id": "session_exec_01"
   }'
+```
+
+---
+
+### `POST /api/agent/stream`
+Streams agent synthesis tokens in real-time using Server-Sent Events (SSE). Emits immediate tool step execution traces, incremental word tokens with micro-delays for a realistic typewriter rendering, and terminal completion payloads.
+
+**Request Body:**
+Identical to `POST /api/agent/query`.
+
+**SSE Event Sequence:**
+1. `event: steps`: Emitted immediately after analytical tool execution, detailing steps taken, SQL queries run, row counts, and intent.
+2. `event: token`: Emitted repeatedly per token chunk `{"token": "..."}`.
+3. `event: done`: Emitted upon stream completion containing the complete structured response object.
+
+**Example Request:**
+```bash
+curl -N -X POST http://localhost:8000/api/agent/stream \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What is our delivered revenue?", "session_id": "stream_user_1"}'
+```
 ```
 
 **Example Response:**
@@ -247,6 +270,15 @@ curl -X POST http://localhost:8000/api/investigation/run \
 ### `GET /api/reports/executive`
 Compiles and returns the formal Executive Business Performance Report in Markdown and JSON formats.
 
+### `GET /api/reports/executive/pdf`
+Compiles and downloads a boardroom-ready Executive PDF Briefing formatted with corporate styling, KPI grids, satisfaction breakdown tables, anomaly audit boxes, and strategic priority scorecards.
+
+**Example Request:**
+```bash
+curl -X GET http://localhost:8000/api/reports/executive/pdf \
+  -o executive_briefing.pdf
+```
+
 ---
 
 ## 7. Evaluation Framework & Benchmarks
@@ -292,4 +324,37 @@ Triggers an automated benchmark evaluation run on demand.
 **Request Body:**
 - `category` (string, optional): Test specific category slice (e.g., `Sales Analytics`).
 - `limit` (integer, optional): Maximum questions to evaluate (default: all).
+
+---
+
+## 8. Local Speech & Voice Analytics
+
+### `GET /api/voice/samples`
+Returns curated speech questions spanning SQL queries, contextual follow-ups, and statistical investigations for zero-latency testing.
+
+**Example Request:**
+```bash
+curl -X GET http://localhost:8000/api/voice/samples
+```
+
+### `POST /api/voice/transcribe`
+Transcribes base64-encoded audio bytes (WAV, WebM, Ogg, MP3) into business query text using local Whisper or acoustic recognition.
+
+**Request Body:**
+- `audio_base64` (string, required): Base64-encoded audio payload.
+- `filename` (string, optional): Original audio filename.
+- `context_hint` (string, optional): Contextual topic hint.
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "text": "What is our total delivered revenue across all quarters?",
+  "confidence": 0.92,
+  "duration_seconds": 2.45,
+  "format": "wav",
+  "engine": "local-acoustic-decoder",
+  "error": null
+}
+```
 
